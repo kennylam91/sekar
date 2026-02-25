@@ -4,6 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import { detectPostType } from "@/lib/post-type-detector";
 import { Post } from "@/types";
 // import { notifyDriversAboutNewRequest } from "@/lib/firebase-admin";
+import { supabase } from "@/lib/supabase";
 
 type FromApi = "facebook-scraper3" | "facebook-scraper-api4";
 
@@ -115,14 +116,6 @@ export async function GET(request: Request) {
         }
 
         try {
-          const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
-          const NEXT_PUBLIC_SUPABASE_ANON_KEY =
-            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-          const supabase = createClient(
-            SUPABASE_URL!,
-            NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-          );
           const { error: insertError } = await supabase
             .from("posts")
             .insert(newPost);
@@ -267,6 +260,7 @@ function buildPostEntity(
           fbPost.url ?? normalizeFacebookUrl(fbPost.author?.url) ?? null,
         facebook_id: fbPost.post_id ?? null,
       };
+      break;
     case "facebook-scraper-api4":
       entity = {
         content: fbPost.values?.text,
@@ -278,6 +272,7 @@ function buildPostEntity(
         facebook_url: fbPost.details?.post_link,
         facebook_id: fbPost.details?.post_id,
       };
+      break;
   }
   if (entity.content) {
     entity.content = entity.content.trim().replace(/"+$/, "").trim();
