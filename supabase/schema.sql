@@ -24,6 +24,7 @@ CREATE TABLE posts (
   phone VARCHAR(20),
   facebook_url VARCHAR(255),
   zalo_url VARCHAR(255),
+  facebook_id VARCHAR(255),
   is_visible BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()

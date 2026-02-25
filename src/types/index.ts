@@ -22,6 +22,7 @@ export interface Post {
   is_visible: boolean;
   created_at: string;
   updated_at: string;
+  facebook_id?: string;
 }
 
 export interface JWTPayload {
