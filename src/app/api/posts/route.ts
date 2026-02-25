@@ -43,20 +43,13 @@ export async function GET(request: NextRequest) {
 
     // Determine which posts to show:
     // - Not logged in (passenger) -> show driver posts
-    // - Logged in as driver (no type filter) -> show passenger posts
-    // - Logged in as driver (type=driver) -> show own posts only
+    // - Logged in as driver -> show passenger posts
     // - Admin -> show all (or use type param)
     let authorType: string | null = null;
-    let ownerFilter: string | null = null;
     if (user?.role === "admin") {
       authorType = type || null; // Admin can filter by type or see all
     } else if (user?.role === "driver") {
-      if (type === "driver") {
-        authorType = "driver";
-        ownerFilter = user.userId; // Only show this driver's own posts
-      } else {
-        authorType = "passenger";
-      }
+      authorType = "passenger";
     } else {
       authorType = "driver";
     }
@@ -71,10 +64,6 @@ export async function GET(request: NextRequest) {
 
     if (authorType) {
       query = query.eq("author_type", authorType);
-    }
-
-    if (ownerFilter) {
-      query = query.eq("user_id", ownerFilter);
     }
 
     const dateFilter = getDateFilter(filter);
@@ -96,10 +85,6 @@ export async function GET(request: NextRequest) {
 
     if (authorType) {
       dataQuery = dataQuery.eq("author_type", authorType);
-    }
-
-    if (ownerFilter) {
-      dataQuery = dataQuery.eq("user_id", ownerFilter);
     }
 
     if (dateFilter) {
