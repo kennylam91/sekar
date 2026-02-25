@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Header from "@/components/Header";
+import FloatingCreateButton from "@/components/FloatingCreateButton";
 
 export const metadata: Metadata = {
   title: "Sekar — Kết nối hành khách & tài xế",
@@ -26,6 +27,7 @@ export default function RootLayout({
       <body>
         <Header />
         <main className="max-w-4xl mx-auto px-4 py-6">{children}</main>
+        <FloatingCreateButton />
       </body>
     </html>
   );

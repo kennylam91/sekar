@@ -93,17 +93,6 @@ export default function Header() {
           )}
         </nav>
 
-        {/* Mobile: Đăng bài button always visible */}
-        <Link
-          href="/dang-bai"
-          className="md:hidden inline-flex items-center gap-1 bg-primary-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Đăng bài
-        </Link>
-
         {/* Mobile menu button */}
         <button
           className="md:hidden p-2 text-gray-600"
