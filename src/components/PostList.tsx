@@ -9,6 +9,8 @@ import Pagination from "./Pagination";
 interface PostListProps {
   /** Which type of posts to fetch. Omit for auto (based on login state). */
   type?: string;
+  /** Fetch the current user's own posts via /api/posts/my */
+  myPosts?: boolean;
   /** Show admin controls */
   showAdminControls?: boolean;
   /** Show edit/delete for owner */
@@ -21,6 +23,7 @@ interface PostListProps {
 
 export default function PostList({
   type,
+  myPosts,
   showAdminControls,
   showOwnerControls,
   currentUserId,
@@ -36,13 +39,17 @@ export default function PostList({
   const fetchPosts = useCallback(async () => {
     setLoading(true);
     try {
-      const params = new URLSearchParams({
-        page: page.toString(),
-        filter,
-      });
-      if (type) params.set("type", type);
+      let url: string;
+      if (myPosts) {
+        const params = new URLSearchParams({ page: page.toString(), filter });
+        url = `/api/posts/my?${params}`;
+      } else {
+        const params = new URLSearchParams({ page: page.toString(), filter });
+        if (type) params.set("type", type);
+        url = `/api/posts?${params}`;
+      }
 
-      const res = await fetch(`/api/posts?${params}`);
+      const res = await fetch(url);
       const data: PostsResponse = await res.json();
 
       setPosts(data.posts);
@@ -53,7 +60,7 @@ export default function PostList({
     } finally {
       setLoading(false);
     }
-  }, [page, filter, type]);
+  }, [page, filter, type, myPosts]);
 
   useEffect(() => {
     fetchPosts();

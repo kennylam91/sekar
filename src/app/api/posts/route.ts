@@ -2,35 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { getCurrentUser } from "@/lib/auth";
 import { notifyDriversOfNewPost } from "@/lib/notifications";
+import { getDateFilter } from "@/lib/posts";
 import type { PostFilter } from "@/types";
 
 const PAGE_SIZE = 10;
 const MIN_CONTENT_LENGTH = 20;
-
-function getDateFilter(filter: PostFilter): string | null {
-  const now = new Date();
-  switch (filter) {
-    case "today": {
-      const start = new Date(now);
-      start.setHours(0, 0, 0, 0);
-      return start.toISOString();
-    }
-    case "2days": {
-      const start = new Date(now);
-      start.setDate(start.getDate() - 2);
-      start.setHours(0, 0, 0, 0);
-      return start.toISOString();
-    }
-    case "week": {
-      const start = new Date(now);
-      start.setDate(start.getDate() - 7);
-      start.setHours(0, 0, 0, 0);
-      return start.toISOString();
-    }
-    default:
-      return null;
-  }
-}
 
 export async function GET(request: NextRequest) {
   try {

@@ -156,7 +156,7 @@ export default function ProfilePage() {
         </h2>
         <PostList
           key={refreshKey}
-          type="driver"
+          myPosts
           showOwnerControls
           currentUserId={user.id}
           onEdit={(post) => setEditingPost(post)}
