@@ -1,8 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function FloatingCreateButton() {
+  const pathname = usePathname();
+
+  if (pathname === "/dang-bai") return null;
+
   return (
     <Link
       href="/dang-bai"
