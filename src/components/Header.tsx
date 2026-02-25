@@ -114,14 +114,6 @@ export default function Header() {
       {/* Mobile menu */}
       {menuOpen && (
         <div className="md:hidden border-t border-gray-100 bg-white px-4 py-3 space-y-2">
-          <Link
-            href="/dang-bai"
-            className="block bg-primary-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium text-center"
-            onClick={() => setMenuOpen(false)}
-          >
-            + Đăng bài
-          </Link>
-
           {loading ? null : user ? (
             <>
               <div className="text-sm text-gray-500 px-1 pt-1">
