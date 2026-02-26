@@ -31,7 +31,7 @@ export default function PostList({
 }: PostListProps) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<PostFilter>("all");
+  const [filter, setFilter] = useState<PostFilter>("today");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
@@ -80,7 +80,7 @@ export default function PostList({
       });
       if (res.ok) {
         setPosts((prev) =>
-          prev.map((p) => (p.id === id ? { ...p, is_visible: visible } : p))
+          prev.map((p) => (p.id === id ? { ...p, is_visible: visible } : p)),
         );
       }
     } catch {

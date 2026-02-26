@@ -5,6 +5,7 @@ import { detectPostType } from "@/lib/post-type-detector";
 import { Post } from "@/types";
 // import { notifyDriversAboutNewRequest } from "@/lib/firebase-admin";
 import { supabase } from "@/lib/supabase";
+import { notifyDriversOfNewPost } from "@/lib/notifications";
 
 type FromApi = "facebook-scraper3" | "facebook-scraper-api4";
 
@@ -47,6 +48,7 @@ export async function GET(request: Request) {
   let totalFetchedPosts = 0;
   let totalSkippedPosts = 0;
   let totalFailedInserts = 0;
+  let totalPassengerPosts = 0;
   const groupResults: any[] = [];
 
   // Use for...of instead of forEach to properly await async operations
@@ -149,11 +151,7 @@ export async function GET(request: Request) {
               `  ✓ Post ${j + 1}/${postsCount}: Created successfully`,
             );
             if (newPost.author_type === "passenger") {
-              try {
-                // await notifyDriversAboutNewRequest(supabase);
-              } catch (notifError) {
-                console.error("Failed to send push notifications:", notifError);
-              }
+              totalPassengerPosts++;
             }
           }
         } catch (err: any) {
@@ -202,6 +200,15 @@ export async function GET(request: Request) {
     totalFailedInserts,
     groupResults,
   );
+
+  if (totalPassengerPosts > 0) {
+    console.log(
+      `🚀 Notifying drivers about ${totalPassengerPosts} new passenger posts...`,
+    );
+    notifyDriversOfNewPost(
+      `Có ${totalPassengerPosts} khách mới tìm xe trên Sekar! 🚗💨`,
+    );
+  }
 
   return NextResponse.json({
     success: true,

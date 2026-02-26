@@ -121,13 +121,13 @@ export default function PostCard({
             </div>
           </div>
           <span
-            className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${
+            className={`text-sm px-3 py-1 rounded-full font-medium shrink-0 ${
               isDriver
                 ? "bg-blue-50 text-blue-700"
                 : "bg-green-50 text-green-700"
             }`}
           >
-            {isDriver ? "Tài xế" : "Hành khách"}
+            {isDriver ? "Tìm khách" : "Tìm xe"}
           </span>
         </div>
 

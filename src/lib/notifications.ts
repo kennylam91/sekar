@@ -34,7 +34,7 @@ export async function notifyDriversOfNewPost(postContent: string) {
     const response = await messaging.sendEachForMulticast({
       tokens: tokenList,
       notification: {
-        title: "🚗 Có hành khách mới đăng bài!",
+        title: "🚗 Có khách tìm xe trên Sekar!",
         body,
       },
       webpush: {
