@@ -1,22 +1,22 @@
-import admin from "firebase-admin";
+import { App, initializeApp, getApps, cert } from "firebase-admin/app";
+import { Messaging } from "firebase-admin/messaging";
+import { getMessaging as getFirebaseMessaging } from "firebase-admin/messaging";
 
 function getFirebaseAdmin() {
-  if (admin.apps.length > 0) {
-    return admin.apps[0]!;
-  }
-
-  const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
-  if (!serviceAccountKey) {
-    console.warn(
-      "FIREBASE_SERVICE_ACCOUNT_KEY not set — push notifications disabled",
-    );
-    return null;
+  if (getApps().length > 0) {
+    return getApps()[0]!;
   }
 
   try {
-    const serviceAccount = JSON.parse(serviceAccountKey);
-    return admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
+    return initializeApp({
+      credential: cert({
+        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+        clientEmail: process.env.NEXT_FIREBASE_CLIENT_EMAIL,
+        privateKey: process.env.NEXT_FIREBASE_PRIVATE_KEY?.replace(
+          /\\n/g,
+          "\n",
+        ),
+      }),
     });
   } catch (err) {
     console.error("Failed to initialize Firebase Admin:", err);
@@ -24,8 +24,8 @@ function getFirebaseAdmin() {
   }
 }
 
-export function getMessaging(): admin.messaging.Messaging | null {
+export function getMessaging(): Messaging | null {
   const app = getFirebaseAdmin();
   if (!app) return null;
-  return admin.messaging(app);
+  return getFirebaseMessaging(app);
 }

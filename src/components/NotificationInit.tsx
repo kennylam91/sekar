@@ -26,15 +26,18 @@ export default function NotificationInit() {
       }
 
       // Register service worker
+      let swReg: ServiceWorkerRegistration;
       try {
-        await navigator.serviceWorker.register("/firebase-messaging-sw.js");
+        swReg = await navigator.serviceWorker.register("/api/firebase-sw", {
+          scope: "/",
+        });
       } catch (err) {
         console.error("Service worker registration failed:", err);
         return;
       }
 
       // Request permission and get token
-      const token = await requestNotificationPermission();
+      const token = await requestNotificationPermission(swReg);
       if (!token) return;
 
       // Send token to server
@@ -51,12 +54,14 @@ export default function NotificationInit() {
 
       // Handle foreground messages
       onForegroundMessage((payload) => {
-        const data = payload as { notification?: { title?: string; body?: string } };
+        const data = payload as {
+          notification?: { title?: string; body?: string };
+        };
         if (data.notification) {
           // Show a browser notification when app is in foreground
           new Notification(data.notification.title || "Sekar", {
             body: data.notification.body || "",
-            icon: "/icon-192.png",
+            icon: "/icon-192.svg",
           });
         }
       });

@@ -29,8 +29,9 @@ export function getFirebaseApp(): FirebaseApp {
 }
 
 export function getFirebaseMessaging(): Messaging | null {
-  if (typeof window === "undefined") return null;
-  if (messaging) return messaging;
+  console.log(window);
+
+  if (!window || typeof window === "undefined") return null;
   try {
     const firebaseApp = getFirebaseApp();
     messaging = getMessaging(firebaseApp);
@@ -41,9 +42,13 @@ export function getFirebaseMessaging(): Messaging | null {
   }
 }
 
-export async function requestNotificationPermission(): Promise<string | null> {
+export async function requestNotificationPermission(
+  swReg: ServiceWorkerRegistration,
+): Promise<string | null> {
   try {
     const permission = await Notification.requestPermission();
+    console.log("permission", permission);
+
     if (permission !== "granted") {
       console.log("Notification permission denied");
       return null;
@@ -53,7 +58,10 @@ export async function requestNotificationPermission(): Promise<string | null> {
     if (!fcmMessaging) return null;
 
     const vapidKey = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
-    const token = await getToken(fcmMessaging, { vapidKey });
+    const token = await getToken(fcmMessaging, {
+      vapidKey,
+      serviceWorkerRegistration: swReg,
+    });
     return token;
   } catch (err) {
     console.error("Failed to get FCM token:", err);
