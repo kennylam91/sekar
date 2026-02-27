@@ -6,6 +6,8 @@ import {
   onForegroundMessage,
 } from "@/lib/firebase-client";
 
+export const NOTIFICATIONS_STORAGE_KEY = "sekar_notifications";
+
 /**
  * Component that initializes FCM for logged-in drivers.
  * Requests notification permission and registers the FCM token.
@@ -22,6 +24,11 @@ export default function NotificationInit() {
       // Check if notifications are supported
       if (!("Notification" in window) || !("serviceWorker" in navigator)) {
         console.log("Notifications not supported in this browser");
+        return;
+      }
+
+      // Respect user preference: skip if explicitly disabled
+      if (localStorage.getItem(NOTIFICATIONS_STORAGE_KEY) === "false") {
         return;
       }
 
