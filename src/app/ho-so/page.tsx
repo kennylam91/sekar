@@ -218,7 +218,7 @@ export default function ProfilePage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-700">
-                Thông báo bài đăng mới
+                Thông báo bài đăng tìm xe mới
               </p>
               <p className="text-xs text-gray-500 mt-0.5">
                 {notificationsEnabled
