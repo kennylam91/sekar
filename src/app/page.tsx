@@ -73,7 +73,10 @@ export default async function HomePage() {
       </div>
 
       {/* Post list */}
-      <PostList initialPosts={initialData.posts} initialTotalPages={initialData.totalPages} />
+      <PostList
+        initialPosts={initialData.posts}
+        initialTotalPages={initialData.totalPages}
+      />
     </div>
   );
 }
