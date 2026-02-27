@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://sekar.vn"; // Replace with actual domain
+  const baseUrl = "https://sekar.cloud";
 
   return [
     {
@@ -25,7 +25,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     {
       url: `${baseUrl}/dang-bai`,
       lastModified: new Date(),
-      changeFrequency: "always",
+      changeFrequency: "monthly",
       priority: 0.9,
     },
   ];

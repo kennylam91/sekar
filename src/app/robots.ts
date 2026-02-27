@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: ["/admin/", "/ho-so/"],
     },
-    sitemap: "https://sekar.vn/sitemap.xml", // Replace with actual domain
+    sitemap: "https://sekar.cloud/sitemap.xml",
   };
 }

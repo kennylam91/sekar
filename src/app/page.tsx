@@ -48,7 +48,7 @@ export default async function HomePage() {
         ) : (
           <div className="bg-green-50 border border-green-200 rounded-xl p-4 sm:p-5">
             <h1 className="text-lg font-bold text-green-900 mb-1">
-              🚗 Tìm tài xế cho tuyến đường của bạn
+              Tìm xe ghép, xe tiện chuyến?
             </h1>
             <p className="text-sm text-green-700 mb-3">
               Xem bài đăng từ <strong>tài xế</strong> có tuyến đường phù hợp,
@@ -59,7 +59,7 @@ export default async function HomePage() {
                 href="/dang-bai"
                 className="inline-flex items-center gap-1 bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
               >
-                + Đăng bài tìm xe
+                + Đăng bài
               </Link>
               <Link
                 href="/dang-ky"
