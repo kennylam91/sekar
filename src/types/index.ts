@@ -32,7 +32,7 @@ export interface JWTPayload {
   displayName: string | null;
 }
 
-export type PostFilter = "today" | "2days" | "week";
+export type PostFilter = "all" | "today" | "2days" | "week";
 
 export interface PostsResponse {
   posts: Post[];

@@ -1,33 +1,20 @@
-"use client";
-
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import PostList from "@/components/PostList";
 import NotificationInit from "@/components/NotificationInit";
-import type { User } from "@/types";
+import { getCurrentUser } from "@/lib/auth";
+import { fetchPosts } from "@/lib/posts";
 
-export default function HomePage() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch("/api/auth/me")
-      .then((res) => res.json())
-      .then((data) => setUser(data.user))
-      .catch(() => setUser(null))
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
-      </div>
-    );
-  }
-
+export default async function HomePage() {
+  const user = await getCurrentUser();
   const isDriver = user?.role === "driver";
   const isAdmin = user?.role === "admin";
+
+  // Fetch initial posts for SSR
+  const initialData = await fetchPosts({
+    page: 1,
+    filter: "today",
+    user,
+  });
 
   return (
     <div>
@@ -39,7 +26,7 @@ export default function HomePage() {
         {isDriver ? (
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 sm:p-5">
             <h1 className="text-lg font-bold text-blue-900 mb-1">
-              👋 Xin chào, {user?.display_name || user?.username}!
+              👋 Xin chào, {user?.displayName || user?.username}!
             </h1>
             <p className="text-sm text-blue-700">
               Bạn đang xem bài đăng từ <strong>hành khách</strong>. Tìm hành
@@ -86,7 +73,7 @@ export default function HomePage() {
       </div>
 
       {/* Post list */}
-      <PostList />
+      <PostList initialPosts={initialData.posts} initialTotalPages={initialData.totalPages} />
     </div>
   );
 }

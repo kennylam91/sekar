@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import type { Post, PostFilter, PostsResponse } from "@/types";
 import PostCard from "./PostCard";
 import FilterBar from "./FilterBar";
@@ -19,6 +19,10 @@ interface PostListProps {
   currentUserId?: string;
   /** Callback when edit is clicked */
   onEdit?: (post: Post) => void;
+  /** Initial posts for SSR */
+  initialPosts?: Post[];
+  /** Initial total pages for SSR */
+  initialTotalPages?: number;
 }
 
 export default function PostList({
@@ -28,13 +32,16 @@ export default function PostList({
   showOwnerControls,
   currentUserId,
   onEdit,
+  initialPosts,
+  initialTotalPages,
 }: PostListProps) {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [posts, setPosts] = useState<Post[]>(initialPosts || []);
+  const [loading, setLoading] = useState(!initialPosts);
   const [filter, setFilter] = useState<PostFilter>("today");
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [totalPages, setTotalPages] = useState(initialTotalPages || 1);
   const [total, setTotal] = useState(0);
+  const isFirstRender = useRef(true);
 
   const fetchPosts = useCallback(async () => {
     setLoading(true);
@@ -63,8 +70,12 @@ export default function PostList({
   }, [page, filter, type, myPosts]);
 
   useEffect(() => {
+    if (isFirstRender.current && initialPosts) {
+      isFirstRender.current = false;
+      return;
+    }
     fetchPosts();
-  }, [fetchPosts]);
+  }, [fetchPosts, initialPosts]);
 
   const handleFilterChange = (newFilter: PostFilter) => {
     setFilter(newFilter);
