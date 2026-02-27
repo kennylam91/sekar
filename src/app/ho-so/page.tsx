@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import PostList from "@/components/PostList";
 import PostForm from "@/components/PostForm";
+import { NOTIFICATIONS_STORAGE_KEY } from "@/components/NotificationInit";
+import { requestNotificationPermission } from "@/lib/firebase-client";
 import type { User, Post } from "@/types";
 
 export default function ProfilePage() {
@@ -14,6 +16,8 @@ export default function ProfilePage() {
   const [message, setMessage] = useState("");
   const [editingPost, setEditingPost] = useState<Post | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [notifToggling, setNotifToggling] = useState(false);
 
   const fetchUser = useCallback(async () => {
     const res = await fetch("/api/auth/me");
@@ -27,7 +31,63 @@ export default function ProfilePage() {
 
   useEffect(() => {
     fetchUser();
+    // Read notification preference from localStorage
+    const stored = localStorage.getItem(NOTIFICATIONS_STORAGE_KEY);
+    setNotificationsEnabled(stored !== "false");
   }, [fetchUser]);
+
+  const handleToggleNotifications = async () => {
+    setNotifToggling(true);
+    try {
+      if (notificationsEnabled) {
+        // Disable: remove FCM tokens from server
+        const res = await fetch("/api/notifications/unsubscribe", {
+          method: "DELETE",
+        });
+        if (!res.ok) {
+          setMessage("Không thể tắt thông báo, vui lòng thử lại");
+          return;
+        }
+        localStorage.setItem(NOTIFICATIONS_STORAGE_KEY, "false");
+        setNotificationsEnabled(false);
+      } else {
+        // Enable: request permission and subscribe
+        if (!("serviceWorker" in navigator)) {
+          setMessage("Trình duyệt không hỗ trợ thông báo đẩy");
+          return;
+        }
+        let swReg: ServiceWorkerRegistration;
+        try {
+          swReg = await navigator.serviceWorker.register("/api/firebase-sw", {
+            scope: "/",
+          });
+        } catch {
+          setMessage("Không thể đăng ký thông báo, vui lòng thử lại");
+          return;
+        }
+        const token = await requestNotificationPermission(swReg);
+        if (!token) {
+          setMessage("Vui lòng cho phép thông báo trong trình duyệt");
+          return;
+        }
+        const res = await fetch("/api/notifications/subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token }),
+        });
+        if (!res.ok) {
+          setMessage("Không thể bật thông báo, vui lòng thử lại");
+          return;
+        }
+        localStorage.setItem(NOTIFICATIONS_STORAGE_KEY, "true");
+        setNotificationsEnabled(true);
+      }
+    } catch {
+      setMessage("Lỗi kết nối");
+    } finally {
+      setNotifToggling(false);
+    }
+  };
 
   const handleUpdateName = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -145,6 +205,40 @@ export default function ProfilePage() {
               }}
               onCancel={() => setEditingPost(null)}
             />
+          </div>
+        </div>
+      )}
+
+      {/* Notification settings - drivers only */}
+      {user.role === "driver" && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 sm:p-6 mb-6">
+          <h2 className="text-lg font-bold text-gray-900 mb-4">
+            Cài đặt thông báo
+          </h2>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-700">
+                Thông báo bài đăng mới
+              </p>
+              <p className="text-xs text-gray-500 mt-0.5">
+                {notificationsEnabled
+                  ? "Bạn đang nhận thông báo khi có khách tìm xe"
+                  : "Bạn đã tắt thông báo bài đăng mới"}
+              </p>
+            </div>
+            <button
+              onClick={handleToggleNotifications}
+              disabled={notifToggling}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors disabled:opacity-50 ${
+                notificationsEnabled ? "bg-primary-600" : "bg-gray-300"
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  notificationsEnabled ? "translate-x-6" : "translate-x-1"
+                }`}
+              />
+            </button>
           </div>
         </div>
       )}
