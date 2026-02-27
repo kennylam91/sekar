@@ -1,30 +1,9 @@
-"use client";
-
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import PostForm from "@/components/PostForm";
-import type { User } from "@/types";
+import { getCurrentUser } from "@/lib/auth";
 
-export default function CreatePostPage() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch("/api/auth/me")
-      .then((res) => res.json())
-      .then((data) => setUser(data.user))
-      .catch(() => setUser(null))
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
-      </div>
-    );
-  }
-
+export default async function CreatePostPage() {
+  const user = await getCurrentUser();
   const isDriver = user?.role === "driver";
 
   return (
