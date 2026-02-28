@@ -131,11 +131,11 @@ export default function PostCard({
           </span>
         </div>
 
-        {/* Content — capped at 2 lines */}
+        {/* Content — capped at 3 lines */}
         <div className="mb-3">
           <p
             ref={contentRef}
-            className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap line-clamp-2"
+            className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap line-clamp-3"
           >
             {post.content}
           </p>
