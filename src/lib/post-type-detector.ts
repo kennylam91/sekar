@@ -13,6 +13,8 @@ export function detectPostType(content: string): AuthorType {
     /tìm\s+người/, // "tìm người",
     /có\s+xe\s+trống/, // "có xe trống",
     /tìm\s+khách/, // "tìm khách",
+    /có\s+xe\s+ghép\s+từ/, // "có xe ghép từ" - driver has a shared car from somewhere
+    /bác\s+nào\s+cần\s+xe/, // "bác nào cần xe" - driver asking if anyone needs the car
   ];
 
   const hasStrongDriverIndicator = strongDriverPatterns.some((pattern) =>
@@ -49,6 +51,7 @@ export function detectPostType(content: string): AuthorType {
     /muốn\s+hỏi\s+xe/, // "muốn hỏi xe"
     /muốn\s+chở\s+xe/, // "muốn chở xe",
     /mình\s+cần\s+đi/, // "mình cần đi"
+    /ai\s+đi\s+ib\s+em/, // "Ai đi ib em" - passenger asking anyone going to contact them
   ];
 
   const hasPassengerIndicator = strongPassengerPatterns.some((pattern) =>
