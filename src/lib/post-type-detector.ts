@@ -37,7 +37,7 @@ export function detectPostType(content: string): AuthorType {
     /nhà\s+em\s+(?:cần|muốn|đi|đang|xin)/, // "nhà em cần/muốn/đi" (NOT "nhà em có xe" which is a driver)
     /cần\s+\d+\s+xe/, // "cần 1 xe"
     /bác\s+tài/, // "bác tài"
-    /có\s+bác\s+nào/, //"có bác nào",
+    /có\s+bác\s+nào\s+(?:xe|cần|coa)/, //"có bác nào xe/cần/coa" - passenger asking
     /muốn\s+ghép\s+\d+\s+ghế/, // "muốn ghép 2 ghế",
     /cho\s+e\s+một\s+ghế/, // "cho e một ghế",
     /cho\s+e\s+\d+\s+ghế/, // "cho e 1 ghế",
@@ -46,6 +46,7 @@ export function detectPostType(content: string): AuthorType {
     /cần\s+\d+\s+ghế/, // "cần 1 ghế"
     /còn\s+xe\s+nào/, // "còn xe nào"
     /cần\s+chuyến\s+xe/, // "cần chuyến xe"
+    /cần\s+\d+\s+chuyến\s+xe/, // "cần 01 chuyến xe"
     /có\s+ai\s+tiện\s+chuyến/, // "có ai tiện chuyến"
     /cần\s+tìm\s+\d+/, // "cần tìm 2 ghế"
     /xin\s+giá/, // "xin giá"

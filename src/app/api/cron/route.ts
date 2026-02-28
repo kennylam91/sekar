@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { detectPostType } from "@/lib/post-type-detector";
 import { Post } from "@/types";
-// import { notifyDriversAboutNewRequest } from "@/lib/firebase-admin";
 import { supabase } from "@/lib/supabase";
 import { notifyDriversOfNewPost } from "@/lib/notifications";
 import { extractPhone } from "@/lib/posts";
