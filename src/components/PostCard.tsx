@@ -132,26 +132,35 @@ export default function PostCard({
         </div>
 
         {/* Content — capped at 3 lines */}
-        <div className="mb-3">
+        <div
+          className="mb-3"
+          onClick={() => {
+            if (isTruncated) {
+              setDialogOpen(true);
+            }
+          }}
+        >
           <p
             ref={contentRef}
             className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap line-clamp-3"
           >
             {post.content}
           </p>
+        </div>
+
+        <div className="flex flex-wrap gap-2 justify-between">
+          <div className="flex flex-wrap gap-2 justify-start">
+            <ContactLinks post={post} />
+          </div>
+
           {isTruncated && (
             <button
               onClick={() => setDialogOpen(true)}
-              className="mt-1 text-xs text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+              className="text-xs text-blue-600 hover:text-blue-800 hover:underline transition-colors px-2"
             >
               Xem thêm
             </button>
           )}
-        </div>
-
-        {/* Contact info */}
-        <div className="flex flex-wrap gap-2">
-          <ContactLinks post={post} />
         </div>
 
         {/* Admin/owner actions */}
