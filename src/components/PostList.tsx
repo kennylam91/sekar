@@ -77,6 +77,20 @@ export default function PostList({
     fetchPosts();
   }, [fetchPosts, initialPosts]);
 
+  // Refetch when the tab becomes visible again (e.g. after clicking a
+  // push notification that focuses an already-open tab).
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        fetchPosts();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [fetchPosts]);
+
   const handleFilterChange = (newFilter: PostFilter) => {
     setFilter(newFilter);
     setPage(1);
