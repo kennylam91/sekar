@@ -30,7 +30,11 @@ export default function LoginPage() {
         return;
       }
 
-      router.push("/");
+      if (data.user?.role === "admin") {
+        router.push("/admin");
+      } else {
+        router.push("/");
+      }
       router.refresh();
     } catch {
       setError("Lỗi kết nối. Vui lòng thử lại.");

@@ -39,7 +39,7 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { content, phone, facebook_url, zalo_url } = body;
+    const { content, phone, facebook_url, zalo_url, author_type } = body;
 
     if (!content || content.trim().length < MIN_CONTENT_LENGTH) {
       return NextResponse.json(
@@ -64,15 +64,24 @@ export async function PUT(
       );
     }
 
+    const updatePayload: Record<string, unknown> = {
+      content: content.trim(),
+      phone: hasPhone ? phone.trim() : null,
+      facebook_url: hasFacebook ? facebook_url.trim() : null,
+      zalo_url: hasZalo ? zalo_url.trim() : null,
+      updated_at: new Date().toISOString(),
+    };
+
+    if (
+      user.role === "admin" &&
+      (author_type === "driver" || author_type === "passenger")
+    ) {
+      updatePayload.author_type = author_type;
+    }
+
     const { data: updated, error } = await supabase
       .from("posts")
-      .update({
-        content: content.trim(),
-        phone: hasPhone ? phone.trim() : null,
-        facebook_url: hasFacebook ? facebook_url.trim() : null,
-        zalo_url: hasZalo ? zalo_url.trim() : null,
-        updated_at: new Date().toISOString(),
-      })
+      .update(updatePayload)
       .eq("id", id)
       .select()
       .single();
