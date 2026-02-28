@@ -112,3 +112,16 @@ export async function fetchPosts({
     totalPages,
   };
 }
+
+// extract vietnamese phone number from post content
+export function extractPhone(message: string | undefined): string | null {
+  if (!message) return null;
+  // Match phone numbers with optional space/dot separators, or 1900.xx.xx.xx format
+  const phoneRegex = /(?:\+84|0)\d(?:[.\s]?\d){8,10}|1900(?:\.\d{2}){3}/g;
+  const match = message.match(phoneRegex);
+  if (!match) return null;
+  const raw = match[0];
+  // Keep 1900.xx.xx.xx format as-is; strip separators from standard numbers
+  if (raw.startsWith("1900")) return raw;
+  return raw.replace(/[\s.]/g, "");
+}
