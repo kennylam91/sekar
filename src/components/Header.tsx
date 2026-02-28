@@ -33,7 +33,7 @@ export default function Header() {
       <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <span className="text-2xl pb-2">🚗</span>
+          <span className="text-2xl pb-1">🚗</span>
           <span className="font-bold text-xl text-primary-700">Sekar</span>
         </Link>
 
