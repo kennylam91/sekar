@@ -6,6 +6,7 @@ import { Post } from "@/types";
 // import { notifyDriversAboutNewRequest } from "@/lib/firebase-admin";
 import { supabase } from "@/lib/supabase";
 import { notifyDriversOfNewPost } from "@/lib/notifications";
+import { extractPhone } from "@/lib/posts";
 
 type FromApi = "facebook-scraper3" | "facebook-scraper-api4";
 
@@ -266,6 +267,7 @@ function buildPostEntity(
         facebook_url:
           fbPost.url ?? normalizeFacebookUrl(fbPost.author?.url) ?? null,
         facebook_id: fbPost.post_id ?? null,
+        phone: extractPhone(fbPost.message),
       };
       break;
     case "facebook-scraper-api4":
@@ -278,6 +280,7 @@ function buildPostEntity(
         user_id: anonymousUserId,
         facebook_url: fbPost.details?.post_link,
         facebook_id: fbPost.details?.post_id,
+        phone: extractPhone(fbPost.values?.text),
       };
       break;
   }

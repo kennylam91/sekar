@@ -32,8 +32,9 @@ export function detectPostType(content: string): AuthorType {
     /cần\s+bao\s+\d{0,1}\s*xe/,
     /cần\s+gửi/,
     /có\s+xe\s+tiện\s+chuyến\s+nào/,
+    /có\s+xe\s+ghép\s+nào/, // "có xe ghép nào" - passenger asking if there's a shared car
     /có\s+xe\s+nào/, // "có xe nào"
-    /nhà\s+em/,
+    /nhà\s+em\s+(?:cần|muốn|đi|đang|xin)/, // "nhà em cần/muốn/đi" (NOT "nhà em có xe" which is a driver)
     /cần\s+\d+\s+xe/, // "cần 1 xe"
     /bác\s+tài/, // "bác tài"
     /có\s+bác\s+nào/, //"có bác nào",

@@ -4,9 +4,7 @@ import { detectPostType } from "../post-type-detector";
 describe("detectPostType", () => {
   it("passenger looking for shared ride from Ha Long", () => {
     expect(
-      detectPostType(
-        "tối mai 28/2 7h e tìm xe ghép từ hạ long về ba chẽ ạ",
-      ),
+      detectPostType("tối mai 28/2 7h e tìm xe ghép từ hạ long về ba chẽ ạ"),
     ).toBe("passenger");
   });
 
@@ -91,9 +89,9 @@ describe("detectPostType", () => {
   });
 
   it("passenger asking for ride from HN to Uong Bi", () => {
-    expect(
-      detectPostType("Mai có xe nào từ HN về Uông Bí ko mn ơi?"),
-    ).toBe("passenger");
+    expect(detectPostType("Mai có xe nào từ HN về Uông Bí ko mn ơi?")).toBe(
+      "passenger",
+    );
   });
 
   it("driver offering pickup with Zalo contact", () => {
@@ -177,15 +175,15 @@ describe("detectPostType", () => {
   });
 
   it("passenger chartering 4-seater HN to Quang Yen", () => {
-    expect(
-      detectPostType("Chiều 14/2, cần bao xe 4 chỗ HN- Quảng Yên"),
-    ).toBe("passenger");
+    expect(detectPostType("Chiều 14/2, cần bao xe 4 chỗ HN- Quảng Yên")).toBe(
+      "passenger",
+    );
   });
 
   it("passenger wanting to send package from Quang Yen to HN", () => {
-    expect(
-      detectPostType("Mình cần gửi đồ từ quảng yên lên HN ạ"),
-    ).toBe("passenger");
+    expect(detectPostType("Mình cần gửi đồ từ quảng yên lên HN ạ")).toBe(
+      "passenger",
+    );
   });
 
   it("passenger asking for ride from Thanh Xuan to Cam Pha", () => {
@@ -234,5 +232,24 @@ describe("detectPostType", () => {
         "Ngày mai mùng 7 (5h-6-h sáng )xe 7 chỗ từ MÓNG CÁI-HÀ NỘI khách bao xe-tiện chuyến Lh:0563233999",
       ),
     ).toBe("driver");
+  });
+
+  it("should be driver", () => {
+    expect(
+      detectPostType(`🚘Nhà Em Có Xe: 4 - 7 Chỗ Chạy Hàng Ngày
+💥☎️ - ZaLo : 0981828618 
+💥Chạy Liên Tục: Ghép Khách - Bao Xe - Gửi Đồ
+💥Phục Vụ Quý Khách - Đưa Đón Tận Nơi 
+💥Đội Ngũ Lái Xe Chuyên Nghiệp 
+💥Hân Hạnh Được Phục Vụ Quý Khách 
+💥Xin Liên Hệ: 0981828618`),
+    ).toBe("driver");
+  });
+
+  it("should be passenger", () => {
+    expect(
+      detectPostType(`Hôm nay Có xe ghép nào từ Mai Động HN về Uông Bí k ạ
+`),
+    ).toBe("passenger");
   });
 });
