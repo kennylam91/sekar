@@ -61,17 +61,19 @@ export default function NotificationInit() {
 
       // Handle foreground messages
       onForegroundMessage((payload) => {
-        const data = payload as {
-          notification?: { title?: string; body?: string };
-          data?: { url?: string };
+        // Payload uses data-only fields — see notifications.ts for rationale.
+        const msg = payload as {
+          data?: { title?: string; body?: string; url?: string };
         };
-        if (data.notification) {
+        const title = msg.data?.title;
+        const body = msg.data?.body;
+        if (title || body) {
           // Use service worker to show notification — works on mobile & desktop
-          swReg.showNotification(data.notification.title || "Sekar", {
-            body: data.notification.body || "",
+          swReg.showNotification(title || "Sekar", {
+            body: body || "",
             icon: "/icon-192.svg",
             badge: "/icon-192.svg",
-            data: { url: data.data?.url || "/" },
+            data: { url: msg.data?.url || "/" },
           });
         }
       });

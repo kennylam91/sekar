@@ -46,14 +46,18 @@ export async function notifyDriversOfNewPost(postContent: string) {
   try {
     const response = await messaging.sendEachForMulticast({
       tokens: tokenList,
-      notification: {
+      // Use data-only payload so the browser never auto-displays a notification.
+      // Both the SW onBackgroundMessage handler and the foreground onMessage
+      // handler read these fields and call showNotification() themselves,
+      // which prevents the double-notification bug caused by a `notification`
+      // field triggering an automatic display AND the explicit handler.
+      data: {
         title: "🚗 Có khách tìm xe trên Sekar!",
         body,
+        url: "/",
       },
       webpush: {
-        fcmOptions: {
-          link: "/",
-        },
+        headers: { Urgency: "high" },
       },
     });
 

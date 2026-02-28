@@ -21,9 +21,12 @@ firebase.initializeApp(${JSON.stringify(config)});
 const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage(function(payload) {
-  const notificationTitle = payload.notification?.title || 'Sekar';
+  // Payload uses data-only fields (no notification field) to avoid the
+  // double-notification bug where Firebase auto-shows one and this handler
+  // shows another.
+  const notificationTitle = payload.data?.title || 'Sekar';
   const notificationOptions = {
-    body: payload.notification?.body || 'Bạn có thông báo mới',
+    body: payload.data?.body || 'Bạn có thông báo mới',
     icon: '/icon-192.svg',
     badge: '/icon-192.svg',
     vibrate: [200, 100, 200],
