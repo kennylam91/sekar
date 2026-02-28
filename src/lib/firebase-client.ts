@@ -29,9 +29,7 @@ export function getFirebaseApp(): FirebaseApp {
 }
 
 export function getFirebaseMessaging(): Messaging | null {
-  console.log(window);
-
-  if (!window || typeof window === "undefined") return null;
+  if (typeof window === "undefined") return null;
   try {
     const firebaseApp = getFirebaseApp();
     messaging = getMessaging(firebaseApp);

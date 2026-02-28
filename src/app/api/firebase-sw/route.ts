@@ -25,7 +25,10 @@ messaging.onBackgroundMessage(function(payload) {
   const notificationOptions = {
     body: payload.notification?.body || 'Bạn có thông báo mới',
     icon: '/icon-192.svg',
+    badge: '/icon-192.svg',
+    vibrate: [200, 100, 200],
     data: { url: payload.data?.url || '/' },
+    requireInteraction: false,
   };
   self.registration.showNotification(notificationTitle, notificationOptions);
 });

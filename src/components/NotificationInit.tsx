@@ -63,12 +63,15 @@ export default function NotificationInit() {
       onForegroundMessage((payload) => {
         const data = payload as {
           notification?: { title?: string; body?: string };
+          data?: { url?: string };
         };
         if (data.notification) {
-          // Show a browser notification when app is in foreground
-          new Notification(data.notification.title || "Sekar", {
+          // Use service worker to show notification — works on mobile & desktop
+          swReg.showNotification(data.notification.title || "Sekar", {
             body: data.notification.body || "",
             icon: "/icon-192.svg",
+            badge: "/icon-192.svg",
+            data: { url: data.data?.url || "/" },
           });
         }
       });
