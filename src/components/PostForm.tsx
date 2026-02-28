@@ -6,6 +6,7 @@ import type { Post } from "@/types";
 interface PostFormProps {
   isDriver: boolean;
   editingPost?: Post | null;
+  isAdmin?: boolean;
   onSuccess?: () => void;
   onCancel?: () => void;
 }
@@ -13,14 +14,20 @@ interface PostFormProps {
 export default function PostForm({
   isDriver,
   editingPost,
+  isAdmin,
   onSuccess,
   onCancel,
 }: PostFormProps) {
   const [authorName, setAuthorName] = useState(editingPost?.author_name || "");
   const [content, setContent] = useState(editingPost?.content || "");
   const [phone, setPhone] = useState(editingPost?.phone || "");
-  const [facebookUrl, setFacebookUrl] = useState(editingPost?.facebook_url || "");
+  const [facebookUrl, setFacebookUrl] = useState(
+    editingPost?.facebook_url || "",
+  );
   const [zaloUrl, setZaloUrl] = useState(editingPost?.zalo_url || "");
+  const [authorType, setAuthorType] = useState<"driver" | "passenger">(
+    editingPost?.author_type ?? (isDriver ? "driver" : "passenger"),
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -39,8 +46,15 @@ export default function PostForm({
         zalo_url: zaloUrl,
       };
 
-      if (!isDriver) {
+      const effectiveIsDriver =
+        isAdmin && editingPost ? authorType === "driver" : isDriver;
+
+      if (!effectiveIsDriver) {
         body.author_name = authorName;
+      }
+
+      if (isAdmin && editingPost) {
+        body.author_type = authorType;
       }
 
       const url = editingPost ? `/api/posts/${editingPost.id}` : "/api/posts";
@@ -59,7 +73,9 @@ export default function PostForm({
         return;
       }
 
-      setSuccess(editingPost ? "Đã cập nhật bài đăng!" : "Đã đăng bài thành công!");
+      setSuccess(
+        editingPost ? "Đã cập nhật bài đăng!" : "Đã đăng bài thành công!",
+      );
 
       if (!editingPost) {
         setContent("");
@@ -77,10 +93,43 @@ export default function PostForm({
     }
   };
 
+  const effectiveIsDriver =
+    isAdmin && editingPost ? authorType === "driver" : isDriver;
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Admin: author type toggle */}
+      {isAdmin && editingPost && (
+        <div>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setAuthorType("driver")}
+              className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                authorType === "driver"
+                  ? "bg-blue-600 text-white border-blue-600"
+                  : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
+              }`}
+            >
+              Tìm khách
+            </button>
+            <button
+              type="button"
+              onClick={() => setAuthorType("passenger")}
+              className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                authorType === "passenger"
+                  ? "bg-green-600 text-white border-green-600"
+                  : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
+              }`}
+            >
+              Tìm xe
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Author name for passengers */}
-      {!isDriver && (
+      {!effectiveIsDriver && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Tên hiển thị <span className="text-red-500">*</span>
@@ -106,7 +155,7 @@ export default function PostForm({
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder={
-            isDriver
+            effectiveIsDriver
               ? "Mô tả tuyến đường, thời gian khởi hành, số ghế trống..."
               : "Mô tả nơi bạn muốn đi, thời gian, số người..."
           }
@@ -154,9 +203,7 @@ export default function PostForm({
         </div>
 
         <div>
-          <label className="block text-xs text-gray-500 mb-1">
-            Link Zalo
-          </label>
+          <label className="block text-xs text-gray-500 mb-1">Link Zalo</label>
           <input
             type="url"
             value={zaloUrl}
@@ -186,11 +233,7 @@ export default function PostForm({
           disabled={loading}
           className="flex-1 bg-primary-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
-          {loading
-            ? "Đang xử lý..."
-            : editingPost
-            ? "Cập nhật"
-            : "Đăng bài"}
+          {loading ? "Đang xử lý..." : editingPost ? "Cập nhật" : "Đăng bài"}
         </button>
         {onCancel && (
           <button

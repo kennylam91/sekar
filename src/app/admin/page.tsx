@@ -12,7 +12,7 @@ export default function AdminPage() {
   const [editingPost, setEditingPost] = useState<Post | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [activeTab, setActiveTab] = useState<"all" | "driver" | "passenger">(
-    "all"
+    "all",
   );
   const [stats, setStats] = useState({
     totalPosts: 0,
@@ -89,9 +89,7 @@ export default function AdminPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <p className="text-sm text-gray-500">Tổng bài đăng</p>
-          <p className="text-2xl font-bold text-gray-900">
-            {stats.totalPosts}
-          </p>
+          <p className="text-2xl font-bold text-gray-900">{stats.totalPosts}</p>
         </div>
         <div className="bg-blue-50 rounded-xl border border-blue-200 p-4">
           <p className="text-sm text-blue-600">Bài từ tài xế</p>
@@ -143,6 +141,7 @@ export default function AdminPage() {
             <PostForm
               isDriver={editingPost.author_type === "driver"}
               editingPost={editingPost}
+              isAdmin
               onSuccess={() => {
                 setEditingPost(null);
                 setRefreshKey((k) => k + 1);
