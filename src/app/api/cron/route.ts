@@ -1,6 +1,5 @@
 import { normalizeFacebookUrl } from "@/lib/url-utils";
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 import { detectPostType } from "@/lib/post-type-detector";
 import { Post } from "@/types";
 import { supabase } from "@/lib/supabase";
@@ -100,6 +99,7 @@ export async function GET(request: Request) {
       let groupCreated = 0;
       let groupSkipped = 0;
       let groupFailed = 0;
+      let createdAuthorNames = new Set<string>();
 
       for (let j = 0; j < fbPosts.length; j++) {
         const fbPost = fbPosts[j];
@@ -114,6 +114,14 @@ export async function GET(request: Request) {
         if (!newPost.content) {
           groupSkipped++;
           console.log(`  ⊘ Post ${j + 1}/${postsCount}: Skipped (no message)`);
+          continue;
+        }
+
+        if (createdAuthorNames.has(newPost.author_name || "")) {
+          groupSkipped++;
+          console.log(
+            `  ⊘ Post ${j + 1}/${postsCount}: Skipped (duplicate author name)`,
+          );
           continue;
         }
 
@@ -152,6 +160,9 @@ export async function GET(request: Request) {
             );
             if (newPost.author_type === "passenger") {
               totalPassengerPosts++;
+            }
+            if (newPost.author_name) {
+              createdAuthorNames.add(newPost.author_name);
             }
           }
         } catch (err: any) {
