@@ -6,6 +6,9 @@ import { supabase } from "./supabase";
  * when a new passenger post is created.
  */
 export async function notifyDriversOfNewPost(postContent: string) {
+  console.log(
+    `[notifications] notifyDriversOfNewPost called — content length: ${postContent.length}`,
+  );
   const messaging = getMessaging();
   if (!messaging) {
     console.warn("Firebase Admin not initialized — skipping notification");

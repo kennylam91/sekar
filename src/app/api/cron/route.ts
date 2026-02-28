@@ -206,7 +206,7 @@ export async function GET(request: Request) {
     console.log(
       `🚀 Notifying drivers about ${totalPassengerPosts} new passenger posts...`,
     );
-    notifyDriversOfNewPost(
+    await notifyDriversOfNewPost(
       `Có ${totalPassengerPosts} khách mới tìm xe trên Sekar! 🚗💨`,
     );
   }
@@ -311,10 +311,11 @@ function reportCronJobResults(
   console.log(`📋 Per-group results:`, groupResults);
 }
 function extractPosts(fromApi: FromApi, resData: any) {
+  if (!resData) return [];
   switch (fromApi) {
     case "facebook-scraper3":
       return resData.posts;
     case "facebook-scraper-api4":
-      return resData.data.posts;
+      return resData.data?.posts;
   }
 }
