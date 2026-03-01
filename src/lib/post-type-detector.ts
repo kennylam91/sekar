@@ -48,6 +48,10 @@ const PASSENGER_PATTERNS: WeightedPattern[] = [
   { pattern: /e\s+bao\s+xe/, weight: 3 }, // "e bao xe"
   { pattern: /báo\s+giá\s+bao\s+xe/, weight: 3 }, // "báo giá bao xe"
   { pattern: /cần\s+gửi/, weight: 2 }, // "cần gửi đồ"
+  { pattern: /muốn\s+gửi/, weight: 2 }, // "muốn gửi về" — sending goods
+  { pattern: /gọi\s+cho\s+mình/, weight: 2 }, // "gọi cho mình nhé" — informal, not a professional driver CTA
+  { pattern: /muốn\s+tìm\s+\d*\s*xe/, weight: 3 }, // "muốn tìm 1 xe"
+  { pattern: /mình\s+có\s+\d+\s+người\s+(?:cần|đi|muốn)/, weight: 3 }, // "mình có 1 người đi từ" — arranging for someone else
   { pattern: /(?<!ai\s)cần\s+xe/, weight: 2 }, // "cần xe" — need a car (not "ai cần xe" which is a driver)
   { pattern: /cần\s+\d+\s+xe/, weight: 2 }, // "cần 1 xe"
   { pattern: /tìm\s+xe/, weight: 2 }, // "tìm xe"

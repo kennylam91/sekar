@@ -141,6 +141,24 @@ describe("detectPostType", () => {
       "Em 1 người cần 1 slot ghép từ UB về mỹ đình Hn ạ, giá 200k đc k ạ",
       "passenger",
     ],
+    [
+      `em có thùng đồ muốn gửi về 
+đông ngũ - tiên yên - quảng ninh
+chiều nay ai nhận ko ah`,
+      "passenger",
+    ],
+    [
+      `Mình đi quảng ninh còn chỗ ai về quảng ninh thì gọi cho mình nhé mình ở hà đông hà nội  đi luôn hôm nay 0988991913`,
+      "passenger",
+    ],
+    [
+      `Sáng mai em muốn tìm 1 xe lúc 3h-3h30 sáng đi từ chợ giếng đáy tới ngô quyền hải phòng thì có bên nào nhận không ạ`,
+      "passenger",
+    ],
+    [
+      `Mai mình có 1 người đi từ Hạ Long về Chợ Quý kim- Hải Phòng . ( gần nút giao cao tốc 353 ((0925543555))`,
+      "passenger",
+    ],
   ] as const)("%s", (input, expected) => {
     expect(detectPostType(input)).toBe(expected);
   });
