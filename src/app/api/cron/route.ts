@@ -59,6 +59,7 @@ export async function GET(request: Request) {
     );
 
     try {
+      await new Promise((resolve) => setTimeout(resolve, 1500)); // 1.5 second delay between groups to avoid rate limits
       const res = await fetchFbPosts(fromApi as FromApi, group);
 
       if (!res.ok) {
