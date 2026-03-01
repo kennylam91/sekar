@@ -23,6 +23,8 @@ interface PostListProps {
   initialPosts?: Post[];
   /** Initial total pages for SSR */
   initialTotalPages?: number;
+  /** Initial data for SSR */
+  initialData?: PostsResponse;
 }
 
 export default function PostList({
@@ -32,15 +34,14 @@ export default function PostList({
   showOwnerControls,
   currentUserId,
   onEdit,
-  initialPosts,
-  initialTotalPages,
+  initialData,
 }: PostListProps) {
-  const [posts, setPosts] = useState<Post[]>(initialPosts || []);
-  const [loading, setLoading] = useState(!initialPosts);
+  const [posts, setPosts] = useState<Post[]>(initialData?.posts || []);
+  const [loading, setLoading] = useState(!initialData?.posts);
   const [filter, setFilter] = useState<PostFilter>("today");
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(initialTotalPages || 1);
-  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(initialData?.totalPages || 1);
+  const [total, setTotal] = useState(initialData?.total || 0);
   const isFirstRender = useRef(true);
 
   const fetchPosts = useCallback(async () => {
@@ -70,12 +71,12 @@ export default function PostList({
   }, [page, filter, type, myPosts]);
 
   useEffect(() => {
-    if (isFirstRender.current && initialPosts) {
+    if (isFirstRender.current && initialData) {
       isFirstRender.current = false;
       return;
     }
     fetchPosts();
-  }, [fetchPosts, initialPosts]);
+  }, [fetchPosts, initialData]);
 
   // Refetch when the tab becomes visible again (e.g. after clicking a
   // push notification that focuses an already-open tab).
