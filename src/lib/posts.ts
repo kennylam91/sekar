@@ -4,28 +4,19 @@ import type { PostFilter, Post, JWTPayload } from "@/types";
 export const PAGE_SIZE = 10;
 
 export function getDateFilter(filter: PostFilter): string | null {
+  if (filter === "all") return null;
+
   const now = new Date();
-  switch (filter) {
-    case "today": {
-      const start = new Date(now);
-      start.setHours(0, 0, 0, 0);
-      return start.toISOString();
-    }
-    case "2days": {
-      const start = new Date(now);
-      start.setDate(start.getDate() - 2);
-      start.setHours(0, 0, 0, 0);
-      return start.toISOString();
-    }
-    case "week": {
-      const start = new Date(now);
-      start.setDate(start.getDate() - 7);
-      start.setHours(0, 0, 0, 0);
-      return start.toISOString();
-    }
-    default:
-      return null;
-  }
+  let daysToSubtract = { today: 0, "2days": 1, week: 6 }[filter];
+
+  return new Date(
+    Date.UTC(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() - daysToSubtract,
+      -7,
+    ),
+  ).toISOString();
 }
 
 export async function fetchPosts({
