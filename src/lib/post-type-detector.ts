@@ -1,163 +1,82 @@
-import type { Post, AuthorType } from "@/types";
+import type { AuthorType } from "@/types";
 
-export function detectPostType(content: string): AuthorType {
-  const normalizedContent = content.toLowerCase();
-  // If scores are equal, check for strong indicators
-  // Phone numbers and hotlines are stronger driver indicators
-  const strongDriverPatterns = [
-    /hotline/, // "hotline" - service contact
-    /ai\s+cần\s+xe/, // "ai cần xe",
-    /giá\s+chỉ\s+từ/, // "giá chỉ từ",
-    /khách\s+hàng/, // "khách hàng",
-    /mình\s+có\s+xe\s+\d+\s+chỗ/, // "mình có xe 7 chỗ",
-    /tìm\s+người/, // "tìm người",
-    /có\s+xe\s+trống/, // "có xe trống",
-    /tìm\s+khách/, // "tìm khách",
-    /có\s+xe\s+ghép\s+từ/, // "có xe ghép từ" - driver has a shared car from somewhere
-    /bác\s+nào\s+cần\s+xe/, // "bác nào cần xe" - driver asking if anyone needs the car
-  ];
-
-  const hasStrongDriverIndicator = strongDriverPatterns.some((pattern) =>
-    pattern.test(normalizedContent),
-  );
-
-  if (hasStrongDriverIndicator) {
-    return "driver";
-  }
-
-  const strongPassengerPatterns = [
-    /cần\s+tìm\s+xe/, // "cần tìm xe" - need to find car
-    /tìm\s+xe/, // "tìm xe" - find car
-    /cần\s+xe/, // "cần xe" - need car
-    /cần\s+bao\s+\d{0,1}\s*xe/,
-    /cần\s+gửi/,
-    /có\s+xe\s+tiện\s+chuyến\s+nào/,
-    /có\s+xe\s+ghép\s+nào/, // "có xe ghép nào" - passenger asking if there's a shared car
-    /có\s+xe\s+nào/, // "có xe nào"
-    /nhà\s+em\s+(?:cần|muốn|đi|đang|xin)/, // "nhà em cần/muốn/đi" (NOT "nhà em có xe" which is a driver)
-    /cần\s+\d+\s+xe/, // "cần 1 xe"
-    /bác\s+tài/, // "bác tài"
-    /có\s+bác\s+nào\s+(?:xe|cần|coa)/, //"có bác nào xe/cần/coa" - passenger asking
-    /muốn\s+ghép\s+\d+\s+ghế/, // "muốn ghép 2 ghế",
-    /cho\s+e\s+một\s+ghế/, // "cho e một ghế",
-    /cho\s+e\s+\d+\s+ghế/, // "cho e 1 ghế",
-    /e\s+bao\s+xe/, // "e bao xe"
-    /báo\s+giá\s+bao\s+xe/, // "báo giá bao xe"
-    /cần\s+\d+\s+ghế/, // "cần 1 ghế"
-    /còn\s+xe\s+nào/, // "còn xe nào"
-    /cần\s+chuyến\s+xe/, // "cần chuyến xe"
-    /cần\s+\d+\s+chuyến\s+xe/, // "cần 01 chuyến xe"
-    /có\s+ai\s+tiện\s+chuyến/, // "có ai tiện chuyến"
-    /cần\s+tìm\s+\d+/, // "cần tìm 2 ghế"
-    /xin\s+giá/, // "xin giá"
-    /muốn\s+hỏi\s+xe/, // "muốn hỏi xe"
-    /muốn\s+chở\s+xe/, // "muốn chở xe",
-    /mình\s+cần\s+đi/, // "mình cần đi"
-    /ai\s+đi\s+ib\s+em/, // "Ai đi ib em" - passenger asking anyone going to contact them
-  ];
-
-  const hasPassengerIndicator = strongPassengerPatterns.some((pattern) =>
-    pattern.test(normalizedContent),
-  );
-
-  if (hasPassengerIndicator) {
-    return "passenger";
-  }
-
-  return "driver";
+interface WeightedPattern {
+  pattern: RegExp;
+  weight: number;
 }
 
 /**
- * Detects the owner type of a post based on its content
- * @param content - The post content to analyze
- * @returns "passenger" if the post is from a passenger, "driver" if from a driver, or null if uncertain
+ * Weighted driver patterns. Higher weight = stronger signal.
  */
-export function detectPostOwnerOld(content: string): AuthorType {
-  if (!content || typeof content !== "string") {
-    return "passenger";
-  }
+const DRIVER_PATTERNS: WeightedPattern[] = [
+  { pattern: /hotline/, weight: 3 },
+  { pattern: /tìm\s+khách/, weight: 3 },
+  { pattern: /có\s+xe\s+trống/, weight: 3 },
+  { pattern: /có\s+xe\s+ghép\s+từ/, weight: 3 }, // "có xe ghép từ X" — driver advertising a ride
+  { pattern: /bác\s+nào\s+cần\s+xe/, weight: 3 }, // "bác nào cần xe" — driver seeking passengers
+  { pattern: /ai\s+cần\s+xe/, weight: 3 }, // "ai cần xe" — driver seeking passengers
+  { pattern: /mình\s+có\s+xe\s+\d+\s+chỗ/, weight: 3 }, // "mình có xe 7 chỗ"
+  { pattern: /nhà\s+em\s+có\s+xe/, weight: 3 }, // "nhà em có xe" — driver
+  { pattern: /phục\s+vụ\s+quý\s+khách/, weight: 3 },
+  { pattern: /đội\s+ngũ\s+lái\s+xe/, weight: 3 },
+  { pattern: /khách\s+hàng/, weight: 2 },
+  { pattern: /giá\s+chỉ\s+từ/, weight: 2 },
+  { pattern: /tìm\s+người/, weight: 2 },
+  { pattern: /nhận\s+gửi\s+hàng/, weight: 2 },
+  { pattern: /đưa\s+đón/, weight: 2 },
+  { pattern: /tuyến\s+cố\s+định/, weight: 2 },
+];
 
-  // Normalize the content to lowercase for case-insensitive matching
-  const normalizedContent = content.toLowerCase();
+/**
+ * Weighted passenger patterns. Higher weight = stronger signal.
+ */
+const PASSENGER_PATTERNS: WeightedPattern[] = [
+  { pattern: /cần\s+tìm\s+xe/, weight: 3 }, // "cần tìm xe"
+  { pattern: /có\s+xe\s+ghép\s+nào/, weight: 3 }, // "có xe ghép nào" — asking for shared ride
+  { pattern: /có\s+xe\s+tiện\s+chuyến\s+nào/, weight: 3 }, // "có xe tiện chuyến nào"
+  { pattern: /có\s+nhà\s+xe\s+nào/, weight: 3 }, // "có nhà xe nào"
+  { pattern: /cần\s+\d+\s+ghế/, weight: 3 }, // "cần 2 ghế"
+  { pattern: /muốn\s+ghép\s+\d*\s*ghế/, weight: 3 }, // "muốn ghép 2 ghế"
+  { pattern: /cho\s+e\s+\d*\s*(?:một\s+)?ghế/, weight: 3 }, // "cho e một ghế", "cho e 1 ghế"
+  { pattern: /cần\s+\d+\s+vé/, weight: 3 }, // "cần 2 vé"
+  { pattern: /cần\s+\d+\s+slot/, weight: 3 }, // "cần 1 slot"
+  { pattern: /cần\s+\d+\s+chuyến\s+xe/, weight: 3 }, // "cần 01 chuyến xe"
+  { pattern: /cần\s+chuyến\s+xe/, weight: 3 }, // "cần chuyến xe"
+  { pattern: /có\s+ai\s+tiện\s+chuyến/, weight: 3 }, // "có ai tiện chuyến"
+  { pattern: /ai\s+đi\s+ib\s+em/, weight: 3 }, // "ai đi ib em" — passenger asking anyone going to contact
+  { pattern: /cần\s+bao\s+\d{0,2}\s*xe/, weight: 3 }, // "cần bao xe", "cần bao 1 xe"
+  { pattern: /e\s+bao\s+xe/, weight: 3 }, // "e bao xe"
+  { pattern: /báo\s+giá\s+bao\s+xe/, weight: 3 }, // "báo giá bao xe"
+  { pattern: /cần\s+gửi/, weight: 2 }, // "cần gửi đồ"
+  { pattern: /(?<!ai\s)cần\s+xe/, weight: 2 }, // "cần xe" — need a car (not "ai cần xe" which is a driver)
+  { pattern: /cần\s+\d+\s+xe/, weight: 2 }, // "cần 1 xe"
+  { pattern: /tìm\s+xe/, weight: 2 }, // "tìm xe"
+  { pattern: /có\s+xe\s+nào/, weight: 2 }, // "có xe nào"
+  { pattern: /còn\s+xe\s+nào/, weight: 2 }, // "còn xe nào"
+  { pattern: /bác\s+tài/, weight: 2 }, // addressing a driver = passenger
+  { pattern: /có\s+bác\s+nào\s+(?:xe|cần|coa)/, weight: 2 }, // "có bác nào xe/cần/coa"
+  { pattern: /mình\s+cần\s+đi/, weight: 2 }, // "mình cần đi"
+  { pattern: /xin\s+giá/, weight: 2 }, // "xin giá"
+  { pattern: /muốn\s+hỏi\s+xe/, weight: 2 }, // "muốn hỏi xe"
+  { pattern: /cần\s+tìm\s+\d+/, weight: 2 }, // "cần tìm 2 ghế"
+  { pattern: /nhà\s+em\s+(?:cần|muốn|đi|đang|xin)/, weight: 2 }, // "nhà em cần/đi..." (NOT "nhà em có xe")
+];
 
-  // Passenger patterns - people looking for rides
-  const passengerPatterns = [
-    /cần\s+tìm\s+xe/, // "cần tìm xe" - need to find car
-    /tìm\s+xe/, // "tìm xe" - find car
-    /cần\s+xe/, // "cần xe" - need car
-    /cần\s+\d+\s+xe/, // "cần 1 xe" - need 1 car
-    /bao\s+xe/, // "bao xe" - rent/charter a car
-  ];
-
-  // Driver patterns - people offering rides/services
-  const driverPatterns = [
-    /hotline/, // "hotline" - service contact
-    /zalo\s*:?\s*\d/, // "Zalo: 0xxx" - contact with phone number
-    /xe\s+ghép/, // "xe ghép" - shared ride service
-    /xe\s+tiện\s+chuyến/, // "xe tiện chuyến" - convenient ride service
-    /báo\s+giá\s+cước/, // "báo giá cước" - quote prices
-    /phục\s+vụ\s+quý\s+khách/, // "phục vụ quý khách" - serve customers
-    /đưa\s+đón/, // "đưa đón" - pick up and drop off service
-    /\d{4}[\s.-]?\d{3}[\s.-]?\d{3}/, // Phone number pattern (xxxx xxx xxx)
-    /0\d{9}/, // Vietnamese phone number (0xxxxxxxxx)
-    /tuyến\s+cố\s+định/, // "tuyến cố định" - fixed routes
-    /ghép\s+ghế/, // "ghép ghế" - shared seats
-    /đội\s+ngũ\s+lái\s+xe/, // "đội ngũ lái xe" - driver team
-    /hợp\s+đồng\s+du\s+lịch/, // "hợp đồng du lịch" - tour contracts
-    /rất\s+hân\s+hạnh/, // "rất hân hạnh" - very honored to serve
-    /đón\s+tận\s+nhà/, // "đón tận nhà" - pick up at home
-    /trả\s+tận\s+nơi/, // "trả tận nơi" - drop off at location
-    /[\d,]+k(?:\s*[-–>]\s*[\d,]+k)?/, // Price patterns like "500k" or "500k-600k"
-  ];
-
-  // Count matches for each type
-  let passengerScore = 0;
-  let driverScore = 0;
-
-  // Check passenger patterns
-  for (const pattern of passengerPatterns) {
-    if (pattern.test(normalizedContent)) {
-      passengerScore++;
-    }
-  }
-
-  // Check driver patterns
-  for (const pattern of driverPatterns) {
-    if (pattern.test(normalizedContent)) {
-      driverScore++;
-    }
-  }
-
-  // Special case: if contains "báo giá" with context
-  // "báo giá luôn" (in passenger context) vs "báo giá cước" (in driver context)
-  const hasBaoGiaLuon = /báo\s+giá\s+luôn/.test(normalizedContent);
-  const hasBaoGiaCuoc = /báo\s+giá\s+cước/.test(normalizedContent);
-
-  if (hasBaoGiaLuon && !hasBaoGiaCuoc) {
-    passengerScore += 2; // Strong passenger indicator
-  }
-
-  // Decision logic
-  if (driverScore > passengerScore) {
-    return "driver";
-  } else if (passengerScore > driverScore) {
-    return "passenger";
-  }
-
-  // "Tìm xe" or "Cần xe" without driver context is passenger
-  const strongPassengerPatterns = [
-    /cần\s+tìm\s+xe/, // "cần tìm xe" - need to find car
-    /tìm\s+xe/, // "tìm xe" - find car
-    /cần\s+xe/, // "cần xe" - need car
-  ];
-
-  const hasPassengerIndicator = strongPassengerPatterns.some((pattern) =>
-    pattern.test(normalizedContent),
+function score(content: string, patterns: WeightedPattern[]): number {
+  return patterns.reduce(
+    (total, { pattern, weight }) =>
+      pattern.test(content) ? total + weight : total,
+    0,
   );
+}
 
-  if (hasPassengerIndicator) {
-    return "passenger";
-  }
+export function detectPostType(content: string): AuthorType {
+  if (!content || typeof content !== "string") return "driver";
 
-  return "passenger";
+  const normalized = content.toLowerCase();
+  const driverScore = score(normalized, DRIVER_PATTERNS);
+  const passengerScore = score(normalized, PASSENGER_PATTERNS);
+
+  // Ties default to "driver" since unclassifiable posts are more likely driver ads
+  return passengerScore > driverScore ? "passenger" : "driver";
 }

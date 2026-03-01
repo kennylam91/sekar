@@ -120,6 +120,27 @@ describe("detectPostType", () => {
       "Cần 01 chuyến xe ghép 2 khách đón tại hạ long về hà nội lúc 22h30 tối 28/2. Inbox",
       "passenger",
     ],
+    [
+      "Có nhà xe nào từ khu công nghiệp đông mai lên Hà Nội không ạ ! Chuyến càng sớm càng tốt",
+      "passenger",
+    ],
+    ["Cần 2 vé về từ ĐH Quốc Gia về Lập Lệ KCN Thuỷ Nguyên HP", "passenger"],
+    [
+      "Đêm nay vf6 từ Hạ Long đi Hà Nội có bác nào đi cùng không giá hạt dổi",
+      "driver",
+    ],
+    [
+      "Sáng mai xe em 5c tầm 9h e lên hà nội có bác nào ghép cùng không ",
+      "driver",
+    ],
+    [
+      "Cần 01 chuyến xe ghép 2 khách đón tại hạ long về hà nội lúc 22h30 tối 28/2. Inbox.",
+      "passenger",
+    ],
+    [
+      "Em 1 người cần 1 slot ghép từ UB về mỹ đình Hn ạ, giá 200k đc k ạ",
+      "passenger",
+    ],
   ] as const)("%s", (input, expected) => {
     expect(detectPostType(input)).toBe(expected);
   });
