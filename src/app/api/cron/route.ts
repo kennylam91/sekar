@@ -49,6 +49,8 @@ export async function GET(request: Request) {
   let totalFailedInserts = 0;
   let totalPassengerPosts = 0;
   const groupResults: any[] = [];
+  let lastRequestsLimit: number | null = null;
+  let lastRequestsRemaining: number | null = null;
 
   // Use for...of instead of forEach to properly await async operations
   for (let i = 0; i < groups.length; i++) {
@@ -62,6 +64,15 @@ export async function GET(request: Request) {
       await new Promise((resolve) => setTimeout(resolve, 1500)); // 1.5 second delay between groups to avoid rate limits
       const res = await fetchFbPosts(fromApi as FromApi, group);
 
+      // Capture rate limit headers
+      const requestsLimit =
+        parseInt(res.headers.get("x-ratelimit-requests-limit") || "") || null;
+      const requestsRemaining =
+        parseInt(res.headers.get("x-ratelimit-requests-remaining") || "") ||
+        null;
+      if (requestsLimit !== null) lastRequestsLimit = requestsLimit;
+      if (requestsRemaining !== null) lastRequestsRemaining = requestsRemaining;
+
       if (!res.ok) {
         const text = await res.text();
         console.error(`❌ API request failed for group ${group}:`, {
@@ -73,6 +84,17 @@ export async function GET(request: Request) {
           group,
           status: "failed",
           error: `API returned ${res.status}`,
+        });
+        await supabase.from("cron_job_logs").insert({
+          api_source: fromApi,
+          group_id: group,
+          status: "failed",
+          total_fetched: 0,
+          total_created: 0,
+          total_skipped: 0,
+          total_passenger_posts: 0,
+          requests_limit: requestsLimit,
+          requests_remaining: requestsRemaining,
         });
         continue;
       }
@@ -94,12 +116,25 @@ export async function GET(request: Request) {
           skipped: 0,
           failed: 0,
         });
+        await supabase.from("cron_job_logs").insert({
+          api_source: fromApi,
+          group_id: group,
+          status: "success",
+          total_fetched: 0,
+          total_created: 0,
+          total_skipped: 0,
+          total_passenger_posts: 0,
+          duration_ms: Date.now() - groupStartTime,
+          requests_limit: requestsLimit,
+          requests_remaining: requestsRemaining,
+        });
         continue;
       }
 
       let groupCreated = 0;
       let groupSkipped = 0;
       let groupFailed = 0;
+      let groupPassengerPosts = 0;
       let createdAuthorNames = new Set<string>();
 
       for (let j = 0; j < fbPosts.length; j++) {
@@ -160,6 +195,7 @@ export async function GET(request: Request) {
               `  ✓ Post ${j + 1}/${postsCount}: Created successfully`,
             );
             if (newPost.author_type === "passenger") {
+              groupPassengerPosts++;
               totalPassengerPosts++;
             }
             if (newPost.author_name) {
@@ -196,9 +232,31 @@ export async function GET(request: Request) {
         failed: groupFailed,
         duration: groupDuration,
       });
+
+      await supabase.from("cron_job_logs").insert({
+        api_source: fromApi,
+        group_id: group,
+        status: "success",
+        total_fetched: postsCount,
+        total_created: groupCreated,
+        total_skipped: groupSkipped,
+        total_passenger_posts: groupPassengerPosts,
+        duration_ms: groupDuration,
+        requests_limit: requestsLimit,
+        requests_remaining: requestsRemaining,
+      });
     } catch (err) {
       console.error(`❌ Unexpected error processing group ${group}:`, err);
       groupResults.push({ group, status: "error", error: String(err) });
+      await supabase.from("cron_job_logs").insert({
+        api_source: fromApi,
+        group_id: group,
+        status: "error",
+        total_fetched: 0,
+        total_created: 0,
+        total_skipped: 0,
+        total_passenger_posts: 0,
+      });
     }
   }
 
