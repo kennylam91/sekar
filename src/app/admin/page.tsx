@@ -85,6 +85,16 @@ export default function AdminPage() {
         Bảng điều khiển quản trị
       </h1>
 
+      {/* Quick navigation */}
+      <div className="flex gap-3 mb-6">
+        <Link
+          href="/admin/scraper"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 text-sm font-medium hover:bg-blue-100 transition-colors"
+        >
+          🔌 Quản lý Facebook Scraper API
+        </Link>
+      </div>
+
       {/* Stats cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <div className="bg-white rounded-xl border border-gray-200 p-4">
