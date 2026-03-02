@@ -159,6 +159,30 @@ chiều nay ai nhận ko ah`,
       `Mai mình có 1 người đi từ Hạ Long về Chợ Quý kim- Hải Phòng . ( gần nút giao cao tốc 353 ((0925543555))`,
       "passenger",
     ],
+    [
+      "X5 đang cửa khẩu móng cái rỗng về hp ace cần xe lh 0963987388 e đón ạ",
+      "passenger",
+    ],
+    [
+      "Hôm nay 18-19hxe 7chỗ Móng Cái- hải ha-đầm hả -Hạ long-sản nhi- Uông bí Ai cần bao xe tiện chuyến góp xăng cũng OK ib em hoặc 0984108077",
+      "driver",
+    ],
+    [
+      "Xe ghép 5-7c chạy hàng ngày các tỉnh HP-TB-NĐ-NBinh-HNam nhận gửi đồ giá rẻ.khách cần xe lh 0586776777",
+      "driver",
+    ],
+    [
+      "Bao xe giá rẻ đưa đón tận nơi🥰🥰🥰🥰TP Bắc Ninh <> Bắc Giang <> Hải Dương <> Hải Phòng <> Quảng Ninh🚕🚕🚕 xe chạy 24/24 alo là có mặt 🚕🚕🚕📱📱📱  Alo - ib - zalo 0913330151  📱📱📱Nhận thông tin chuyến đi giá xe bao xe ghép xe",
+      "driver",
+    ],
+    [
+      "Cần chuyển tài liệu từ đường Amata KCN Sông Khoai Hiệp Hoà về Lê Văn Lương Hà Nội Chuyển gấp báo phí giúp mk ạ",
+      "passenger",
+    ],
+    [
+      "Mình gửi đồ từ Hà Phong đi Hà Nội . Ai nhận k ( túi đồ nhỏ)",
+      "passenger",
+    ],
   ] as const)("%s", (input, expected) => {
     expect(detectPostType(input)).toBe(expected);
   });

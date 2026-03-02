@@ -22,7 +22,7 @@ const DRIVER_PATTERNS: WeightedPattern[] = [
   { pattern: /khách\s+hàng/, weight: 2 },
   { pattern: /giá\s+chỉ\s+từ/, weight: 2 },
   { pattern: /tìm\s+người/, weight: 2 },
-  { pattern: /nhận\s+gửi\s+hàng/, weight: 2 },
+  { pattern: /nhận\s+gửi/, weight: 2 },
   { pattern: /đưa\s+đón/, weight: 2 },
   { pattern: /tuyến\s+cố\s+định/, weight: 2 },
 ];
@@ -44,15 +44,15 @@ const PASSENGER_PATTERNS: WeightedPattern[] = [
   { pattern: /cần\s+chuyến\s+xe/, weight: 3 }, // "cần chuyến xe"
   { pattern: /có\s+ai\s+tiện\s+chuyến/, weight: 3 }, // "có ai tiện chuyến"
   { pattern: /ai\s+đi\s+ib\s+em/, weight: 3 }, // "ai đi ib em" — passenger asking anyone going to contact
-  { pattern: /cần\s+bao\s+\d{0,2}\s*xe/, weight: 3 }, // "cần bao xe", "cần bao 1 xe"
-  { pattern: /e\s+bao\s+xe/, weight: 3 }, // "e bao xe"
+  { pattern: /(?<!ai\s)cần\s+bao\s+\d{0,2}\s*xe/, weight: 3 }, // "cần bao xe", "cần bao 1 xe" (not "ai cần bao xe" which is a driver)
+  { pattern: /(?<!\w)e\s+bao\s+xe/, weight: 3 }, // "e bao xe" (not the "e" at the end of "xe")
   { pattern: /báo\s+giá\s+bao\s+xe/, weight: 3 }, // "báo giá bao xe"
   { pattern: /cần\s+gửi/, weight: 2 }, // "cần gửi đồ"
   { pattern: /muốn\s+gửi/, weight: 2 }, // "muốn gửi về" — sending goods
   { pattern: /gọi\s+cho\s+mình/, weight: 2 }, // "gọi cho mình nhé" — informal, not a professional driver CTA
   { pattern: /muốn\s+tìm\s+\d*\s*xe/, weight: 3 }, // "muốn tìm 1 xe"
   { pattern: /mình\s+có\s+\d+\s+người\s+(?:cần|đi|muốn)/, weight: 3 }, // "mình có 1 người đi từ" — arranging for someone else
-  { pattern: /(?<!ai\s)cần\s+xe/, weight: 2 }, // "cần xe" — need a car (not "ai cần xe" which is a driver)
+  { pattern: /(?<!(?:ai|khách)\s)cần\s+xe/, weight: 2 }, // "cần xe" — need a car (not "ai cần xe" or "khách cần xe" which are driver phrases)
   { pattern: /cần\s+\d+\s+xe/, weight: 2 }, // "cần 1 xe"
   { pattern: /tìm\s+xe/, weight: 2 }, // "tìm xe"
   { pattern: /có\s+xe\s+nào/, weight: 2 }, // "có xe nào"
@@ -64,6 +64,8 @@ const PASSENGER_PATTERNS: WeightedPattern[] = [
   { pattern: /muốn\s+hỏi\s+xe/, weight: 2 }, // "muốn hỏi xe"
   { pattern: /cần\s+tìm\s+\d+/, weight: 2 }, // "cần tìm 2 ghế"
   { pattern: /nhà\s+em\s+(?:cần|muốn|đi|đang|xin)/, weight: 2 }, // "nhà em cần/đi..." (NOT "nhà em có xe")
+  { pattern: /báo\s+phí/, weight: 2 }, // "báo phí giúp" — asking for a price quote = passenger
+  { pattern: /(?<!nhận\s)gửi\s+đồ/, weight: 2 }, // "gửi đồ" — sending goods = passenger (not "nhận gửi đồ" which is a driver offering)
 ];
 
 function score(content: string, patterns: WeightedPattern[]): number {
