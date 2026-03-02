@@ -118,12 +118,37 @@ export async function GET(request: Request) {
           continue;
         }
 
-        if (createdAuthorNames.has(newPost.author_name || "")) {
+        if (
+          newPost.author_name &&
+          createdAuthorNames.has(newPost.author_name)
+        ) {
           groupSkipped++;
           console.log(
             `  ⊘ Post ${j + 1}/${postsCount}: Skipped (duplicate author name)`,
           );
           continue;
+        }
+
+        // Skip if a post with the same author_name + phone already exists in the last 4 hours
+        if (newPost.author_name && newPost.phone) {
+          const fourHoursAgo = new Date(
+            Date.now() - 4 * 60 * 60 * 1000,
+          ).toISOString();
+          const { data: existingPosts } = await supabase
+            .from("posts")
+            .select("id")
+            .eq("author_name", newPost.author_name)
+            .eq("phone", newPost.phone)
+            .gte("created_at", fourHoursAgo)
+            .limit(1);
+
+          if (existingPosts && existingPosts.length > 0) {
+            groupSkipped++;
+            console.log(
+              `  ⊘ Post ${j + 1}/${postsCount}: Skipped (duplicated within 4 hours)`,
+            );
+            continue;
+          }
         }
 
         try {
