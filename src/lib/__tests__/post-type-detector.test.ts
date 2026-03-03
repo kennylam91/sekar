@@ -196,6 +196,22 @@ chiều nay ai nhận ko ah`,
       "driver",
     ],
     ["mưa gió mọi người cần xe thì alo cho e nhaaa ☎️0349751489📲", "driver"],
+    [
+      "KÍNH CHÀO QUÝ KHÁCH Mời quý khách liên hệ đt #và zalo# ☎️ 0866.953.359 🚗 hàng ngày xe 5-7 chỗ nhận ghép khách-bao xe và gửi đồ hoả tốc uy tín đón trả tận nơi hai đầu",
+      "driver",
+    ],
+    [
+      "Xe tim khách ghép Xe ghép chuyên nghiệp uy tín Các bác cần xe thì ới em nha ☎️zalo/ sdt đặt xe nhanh 092.1508.555",
+      "driver",
+    ],
+    [
+      "Chiều mai 16-17h ngày 4/3 xe mình trống 4 ghế từ Hải phòng đi Hà Nội . Mn ai có cần xe cùng tuyến đường lh 0898472888 nhé . Giá yêu thương",
+      "driver",
+    ],
+    [
+      "Hàng ngày nhà xe vẫn có xe 5 chỗ & 7 chỗ tiện chuyến: Hà Nội-Thái Bình - Hải Phòng - Quảng Ninh.  Các bác cần cứ liên hệ đặt xe sớm ạ.  Rất vui phục vụ các bác: 0865322662-0865292662",
+      "driver",
+    ],
   ] as const)("%s", (input, expected) => {
     expect(detectPostType(input)).toBe(expected);
   });
