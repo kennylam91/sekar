@@ -22,6 +22,10 @@ const DRIVER_PATTERNS: WeightedPattern[] = [
   { pattern: /nhà\s+em\s+có\s+xe/, weight: 3 }, // "nhà em có xe" — driver
   { pattern: /phục\s+vụ\s+quý\s+khách/, weight: 3 },
   { pattern: /đội\s+ngũ\s+lái\s+xe/, weight: 3 },
+  { pattern: /kính\s+chào\s+quý\s+khách/, weight: 3 }, // "kính chào quý khách" — formal driver greeting to customers
+  { pattern: /nhận\s+ghép\s+khách/, weight: 3 }, // "nhận ghép khách" — driver accepting shared-ride passengers
+  { pattern: /các\s+bác\s+cần\s+xe/, weight: 3 }, // "các bác cần xe" — driver addressing potential passengers
+  { pattern: /xe\s+(?:mình|em)\s+trống/, weight: 3 }, // "xe mình/em trống" — driver has empty seats
   { pattern: /khách\s+hàng/, weight: 2 },
   { pattern: /giá\s+chỉ\s+từ/, weight: 2 },
   { pattern: /tìm\s+người/, weight: 2 },
