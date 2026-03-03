@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import PostList from "@/components/PostList";
 import PostForm from "@/components/PostForm";
+import FacebookGroupsManager from "@/components/FacebookGroupsManager";
 import type { User, Post } from "@/types";
 
 export default function AdminPage() {
@@ -161,6 +162,14 @@ export default function AdminPage() {
           showAdminControls
           onEdit={(post) => setEditingPost(post)}
         />
+      </div>
+
+      {/* Facebook Groups Manager */}
+      <div className="mt-8">
+        <h2 className="text-xl font-bold text-gray-900 mb-4">
+          Cấu hình nhóm Facebook
+        </h2>
+        <FacebookGroupsManager />
       </div>
     </div>
   );
