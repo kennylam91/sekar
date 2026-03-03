@@ -183,6 +183,19 @@ chiều nay ai nhận ko ah`,
       "Mình gửi đồ từ Hà Phong đi Hà Nội . Ai nhận k ( túi đồ nhỏ)",
       "passenger",
     ],
+    [
+      "23h mình có xe quay đầu từ Hp-hl giá tiện chuyến. Sdt bác tài 0398582223",
+      "driver",
+    ],
+    [
+      "🆘🆘 Mai 11h - 13h em có xe 7 chỗ trống trở gió từ Tiên Yên - Hạ Long - Uông Bí - Bắc Ninh - Hà Nội , ace nào cần xe tiện chuyến , bao xe ghép ghế alo em đón ạ 🚘🚗🚗🚗🚗",
+      "driver",
+    ],
+    [
+      "Hàng ngày bên em vẫn có xe 5&7 chỗ chạy Hạ Long đi  Hải phòng, Hà Nội và ngược lại. Nhận bao xe, ghép xe, gửi đồ giá rẻ.",
+      "driver",
+    ],
+    ["mưa gió mọi người cần xe thì alo cho e nhaaa ☎️0349751489📲", "driver"],
   ] as const)("%s", (input, expected) => {
     expect(detectPostType(input)).toBe(expected);
   });

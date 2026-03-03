@@ -15,7 +15,10 @@ const DRIVER_PATTERNS: WeightedPattern[] = [
   { pattern: /có\s+xe\s+ghép\s+từ/, weight: 3 }, // "có xe ghép từ X" — driver advertising a ride
   { pattern: /bác\s+nào\s+cần\s+xe/, weight: 3 }, // "bác nào cần xe" — driver seeking passengers
   { pattern: /ai\s+cần\s+xe/, weight: 3 }, // "ai cần xe" — driver seeking passengers
-  { pattern: /mình\s+có\s+xe\s+\d+\s+chỗ/, weight: 3 }, // "mình có xe 7 chỗ"
+  { pattern: /(?:mình|em)\s+có\s+xe\s+\d+\s+chỗ/, weight: 3 }, // "mình/em có xe 7 chỗ"
+  { pattern: /có\s+xe\s+quay\s+đầu/, weight: 3 }, // "có xe quay đầu" — returning empty vehicle
+  { pattern: /nhận\s+bao\s+xe/, weight: 3 }, // "nhận bao xe" — driver accepting charter bookings
+  { pattern: /mọi\s+người\s+cần\s+xe/, weight: 3 }, // "mọi người cần xe" — driver addressing potential passengers
   { pattern: /nhà\s+em\s+có\s+xe/, weight: 3 }, // "nhà em có xe" — driver
   { pattern: /phục\s+vụ\s+quý\s+khách/, weight: 3 },
   { pattern: /đội\s+ngũ\s+lái\s+xe/, weight: 3 },
