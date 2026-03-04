@@ -105,7 +105,7 @@ export async function GET(request: Request) {
       for (let j = 0; j < fbPosts.length; j++) {
         const fbPost = fbPosts[j];
 
-        const newPost = buildPostEntity(
+        const newPost = await buildPostEntity(
           fromApi as FromApi,
           fbPost,
           anonymousUserId!,
@@ -287,7 +287,7 @@ function fetchFbPosts(fromApi: FromApi, groupId: string) {
   });
 }
 
-function buildPostEntity(
+async function buildPostEntity(
   fromApi: FromApi,
   fbPost: any,
   anonymousUserId: string,
@@ -297,7 +297,9 @@ function buildPostEntity(
     case "facebook-scraper3":
       entity = {
         content: fbPost.message,
-        author_type: fbPost.message ? detectPostType(fbPost.message) : "driver",
+        author_type: fbPost.message
+          ? await detectPostType(fbPost.message)
+          : "driver",
         author_name: fbPost.author?.name ?? null,
         user_id: anonymousUserId,
         facebook_url:
@@ -310,7 +312,7 @@ function buildPostEntity(
       entity = {
         content: fbPost.values?.text,
         author_type: fbPost.values?.text
-          ? detectPostType(fbPost.values?.text)
+          ? await detectPostType(fbPost.values?.text)
           : "driver",
         author_name: fbPost.user_details?.name ?? null,
         user_id: anonymousUserId,

@@ -1,4 +1,4 @@
-﻿import { describe, it, expect } from "vitest";
+﻿import { describe, it, vi, expect } from "vitest";
 import { detectPostType } from "../post-type-detector";
 
 describe("detectPostType", () => {
@@ -30,7 +30,7 @@ describe("detectPostType", () => {
     ],
     [
       "Chiều mai 28. 3h bắt đầu. Hải Phòng Uông bí Hạ long Móng cái Ai đi ib em giá tiện chuyến thôi 0984198077",
-      "passenger",
+      "driver",
     ],
     [
       "Sáng mai 5H mình cần bao xe bốn chỗ từ hà nội đi hạ long quang ninh  nhờ ad giá với ạ 0988678004",
@@ -149,7 +149,7 @@ chiều nay ai nhận ko ah`,
     ],
     [
       `Mình đi quảng ninh còn chỗ ai về quảng ninh thì gọi cho mình nhé mình ở hà đông hà nội  đi luôn hôm nay 0988991913`,
-      "passenger",
+      "driver",
     ],
     [
       `Sáng mai em muốn tìm 1 xe lúc 3h-3h30 sáng đi từ chợ giếng đáy tới ngô quyền hải phòng thì có bên nào nhận không ạ`,
@@ -161,7 +161,7 @@ chiều nay ai nhận ko ah`,
     ],
     [
       "X5 đang cửa khẩu móng cái rỗng về hp ace cần xe lh 0963987388 e đón ạ",
-      "passenger",
+      "driver",
     ],
     [
       "Hôm nay 18-19hxe 7chỗ Móng Cái- hải ha-đầm hả -Hạ long-sản nhi- Uông bí Ai cần bao xe tiện chuyến góp xăng cũng OK ib em hoặc 0984108077",
@@ -212,7 +212,12 @@ chiều nay ai nhận ko ah`,
       "Hàng ngày nhà xe vẫn có xe 5 chỗ & 7 chỗ tiện chuyến: Hà Nội-Thái Bình - Hải Phòng - Quảng Ninh.  Các bác cần cứ liên hệ đặt xe sớm ạ.  Rất vui phục vụ các bác: 0865322662-0865292662",
       "driver",
     ],
-  ] as const)("%s", (input, expected) => {
-    expect(detectPostType(input)).toBe(expected);
+    [
+      "Sáng sớm t5 xe em từ HN về HL. Ai đi LH em giá góp xăng.0973603962",
+      "driver",
+    ],
+  ] as const)("%s", async (input, expected) => {
+    const actual = await detectPostType(input);
+    expect(actual).toBe(expected);
   });
 });
