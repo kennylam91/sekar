@@ -38,6 +38,7 @@ export async function GET(request: Request) {
   const { data: dbGroups, error: dbGroupsError } = await supabase
     .from("facebook_groups")
     .select("facebook_id")
+    .eq("is_enabled", true)
     .order("created_at", { ascending: true });
 
   if (dbGroupsError) {
@@ -50,18 +51,11 @@ export async function GET(request: Request) {
     }));
     console.log(`📋 Loaded ${groups.length} Facebook groups from database`);
   } else {
-    // Fallback to env variable (no group_id available)
-    const groupsEnv = process.env.NEXT_CRON_FACEBOOK_GROUPS || "";
-    groups = groupsEnv
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean)
-      .map((facebook_id) => ({ facebook_id }));
-    if (groups.length > 0) {
-      console.log(
-        `📋 Loaded ${groups.length} Facebook groups from environment variable (fallback)`,
-      );
-    }
+    console.warn("⚠️ No Facebook groups found in database.");
+    return NextResponse.json(
+      { error: "No Facebook groups found in database" },
+      { status: 400 },
+    );
   }
 
   if (!groups || groups.length === 0) {

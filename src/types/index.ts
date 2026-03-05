@@ -39,6 +39,7 @@ export interface FacebookGroup {
   id: string;
   facebook_id: string;
   name: string;
+  is_enabled: boolean;
   posts_in_last_month: number;
   total_members: number;
   note: string | null;

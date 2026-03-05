@@ -33,6 +33,7 @@ export default function FacebookGroupsManager() {
 
   // Delete confirmation
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
 
   const fetchGroups = useCallback(async () => {
     setLoading(true);
@@ -120,6 +121,29 @@ export default function FacebookGroupsManager() {
     }
   }
 
+  async function handleToggle(id: string, is_enabled: boolean) {
+    setTogglingId(id);
+    try {
+      const res = await fetch(`/api/admin/facebook-groups/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ is_enabled }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        setError(json.error || "Lỗi cập nhật trạng thái");
+      } else {
+        setGroups((prev) =>
+          prev.map((g) => (g.id === id ? { ...g, is_enabled } : g)),
+        );
+      }
+    } catch {
+      setError("Lỗi kết nối");
+    } finally {
+      setTogglingId(null);
+    }
+  }
+
   async function handleDelete(id: string) {
     setSaving(true);
     try {
@@ -181,6 +205,7 @@ export default function FacebookGroupsManager() {
                   Thành viên
                 </th>
                 <th className="pb-2 pr-3">Ghi chú</th>
+                <th className="pb-2 pr-3 text-center">Kích hoạt</th>
                 <th className="pb-2 text-right">Thao tác</th>
               </tr>
             </thead>
@@ -201,6 +226,22 @@ export default function FacebookGroupsManager() {
                   </td>
                   <td className="py-2.5 pr-3 text-gray-500 max-w-[180px] truncate">
                     {g.note || "—"}
+                  </td>
+                  <td className="py-2.5 pr-3 text-center">
+                    <button
+                      onClick={() => handleToggle(g.id, !g.is_enabled)}
+                      disabled={togglingId === g.id}
+                      aria-label={g.is_enabled ? "Vô hiệu hóa" : "Kích hoạt"}
+                      className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none disabled:opacity-50 ${
+                        g.is_enabled ? "bg-primary-600" : "bg-gray-300"
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${
+                          g.is_enabled ? "translate-x-5" : "translate-x-0.5"
+                        }`}
+                      />
+                    </button>
                   </td>
                   <td className="py-2.5 text-right whitespace-nowrap">
                     <button

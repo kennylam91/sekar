@@ -71,6 +71,48 @@ export async function PUT(
   }
 }
 
+export async function PATCH(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    const user = await getCurrentUser();
+    if (!user || user.role !== "admin") {
+      return NextResponse.json(
+        { error: "Không có quyền truy cập" },
+        { status: 403 },
+      );
+    }
+
+    const { id } = await params;
+    const body = await request.json();
+    const { is_enabled } = body;
+
+    if (typeof is_enabled !== "boolean") {
+      return NextResponse.json(
+        { error: "Giá trị is_enabled không hợp lệ" },
+        { status: 400 },
+      );
+    }
+
+    const { data, error } = await supabase
+      .from("facebook_groups")
+      .update({ is_enabled, updated_at: new Date().toISOString() })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Failed to toggle facebook_group:", error);
+      return NextResponse.json({ error: "Lỗi hệ thống" }, { status: 500 });
+    }
+
+    return NextResponse.json({ data });
+  } catch {
+    return NextResponse.json({ error: "Lỗi hệ thống" }, { status: 500 });
+  }
+}
+
 export async function DELETE(
   _request: Request,
   { params }: { params: Promise<{ id: string }> },
