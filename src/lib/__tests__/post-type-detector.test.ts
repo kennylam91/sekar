@@ -30,7 +30,7 @@ describe("detectPostType", () => {
     ],
     [
       "Chiều mai 28. 3h bắt đầu. Hải Phòng Uông bí Hạ long Móng cái Ai đi ib em giá tiện chuyến thôi 0984198077",
-      "passenger",
+      "driver",
     ],
     [
       "Sáng mai 5H mình cần bao xe bốn chỗ từ hà nội đi hạ long quang ninh  nhờ ad giá với ạ 0988678004",
@@ -111,7 +111,7 @@ describe("detectPostType", () => {
       "🚘Nhà Em Có Xe: 4 - 7 Chỗ Chạy Hàng Ngày\n💥☎️ - ZaLo : 0981828618 \n💥Chạy Liên Tục: Ghép Khách - Bao Xe - Gửi Đồ\n💥Phục Vụ Quý Khách - Đưa Đón Tận Nơi \n💥Đội Ngũ Lái Xe Chuyên Nghiệp \n💥Hân Hạnh Được Phục Vụ Quý Khách \n💥Xin Liên Hệ: 0981828618",
       "driver",
     ],
-    ["Hôm nay Có xe ghép nào từ Mai Động HN về Uông Bí k ạ\n", "passenger"],
+    ["Hôm nay Có xe ghép nào từ Mai Động HN về Uông Bí k ạ", "passenger"],
     [
       "Sáng mai xe em 5c tầm 9h e lên hà nội có bác nào ghép cùng không",
       "driver",
@@ -142,9 +142,7 @@ describe("detectPostType", () => {
       "passenger",
     ],
     [
-      `em có thùng đồ muốn gửi về 
-đông ngũ - tiên yên - quảng ninh
-chiều nay ai nhận ko ah`,
+      `em có thùng đồ muốn gửi về đông ngũ - tiên yên - quảng ninh chiều nay ai nhận ko ah`,
       "passenger",
     ],
     [
@@ -161,7 +159,7 @@ chiều nay ai nhận ko ah`,
     ],
     [
       "X5 đang cửa khẩu móng cái rỗng về hp ace cần xe lh 0963987388 e đón ạ",
-      "passenger",
+      "driver",
     ],
     [
       "Hôm nay 18-19hxe 7chỗ Móng Cái- hải ha-đầm hả -Hạ long-sản nhi- Uông bí Ai cần bao xe tiện chuyến góp xăng cũng OK ib em hoặc 0984108077",
@@ -210,6 +208,27 @@ chiều nay ai nhận ko ah`,
     ],
     [
       "Hàng ngày nhà xe vẫn có xe 5 chỗ & 7 chỗ tiện chuyến: Hà Nội-Thái Bình - Hải Phòng - Quảng Ninh.  Các bác cần cứ liên hệ đặt xe sớm ạ.  Rất vui phục vụ các bác: 0865322662-0865292662",
+      "driver",
+    ],
+    ["Ace cần xe cứ nhấc máy goi ngay e nhé. 0788235068. 0859557866", "driver"],
+    [
+      "Xe ghép hưng yên __Hà nội __sân bay __các tỉnh ghép xe _bao xe_gửi đồ. Liên tục từ 4h sáng đến 22h đêm phục vụ 24/24..liên hệ 097.8899.333. A",
+      "driver",
+    ],
+    [
+      `Hàng ngày nhà xe vẫn có xe 5 chỗ & 7 chỗ tiện chuyến: Hà Nội-Thái Bình - Hải Phòng - Quảng Ninh.  Các bác cần cứ liên hệ đặt xe sớm ạ.  Rất vui phục vụ các bác: 0865322662-0865292662
+- Xe ghep HN - TB - HP chỉ 250 -300- 400k 
+- Bao xe TB - HP chỉ từ 500-550k ( xe 5) 650-700k ( xe 7 )
+- Bao xe TB- HN chỉ 800- 850k (xe 5 ) 950-1100k (xe 7)
+- Gửi đồ 100- 200k`,
+      "driver",
+    ],
+    [
+      "Hàng ngày có Xe 5&7c chạy Hà nội-Hải phòng -Hạ long & ngược lại.Nhận khách ghép,bao xe và gửi đồ giá rẻ. Quý khách cần 🚘 mời LH.",
+      "driver",
+    ],
+    [
+      "Sáng chủ nhật ngày mùng 8 em tiện đường từ mông dương đi lý nhân hà nam ai đi cùng hoặc gửi đồ alo 0339338388  em đi xe không đồ đạc người và xe máy đều nhận chở hết ạ",
       "driver",
     ],
   ] as const)("%s", (input, expected) => {

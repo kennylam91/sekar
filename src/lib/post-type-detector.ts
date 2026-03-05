@@ -26,6 +26,9 @@ const DRIVER_PATTERNS: WeightedPattern[] = [
   { pattern: /nhận\s+ghép\s+khách/, weight: 3 }, // "nhận ghép khách" — driver accepting shared-ride passengers
   { pattern: /các\s+bác\s+cần\s+xe/, weight: 3 }, // "các bác cần xe" — driver addressing potential passengers
   { pattern: /xe\s+(?:mình|em)\s+trống/, weight: 3 }, // "xe mình/em trống" — driver has empty seats
+  { pattern: /ai\s+đi\s+ib\s+em/, weight: 3 }, // "ai đi ib em" — driver inviting passengers to message them
+  { pattern: /bao\s+xe/, weight: 2 }, // "bao xe" — charter service offering (driver)
+  { pattern: /nhận\s+chở/, weight: 2 }, // "nhận chở" — driver accepting passengers/goods
   { pattern: /khách\s+hàng/, weight: 2 },
   { pattern: /giá\s+chỉ\s+từ/, weight: 2 },
   { pattern: /tìm\s+người/, weight: 2 },
@@ -50,7 +53,6 @@ const PASSENGER_PATTERNS: WeightedPattern[] = [
   { pattern: /cần\s+\d+\s+chuyến\s+xe/, weight: 3 }, // "cần 01 chuyến xe"
   { pattern: /cần\s+chuyến\s+xe/, weight: 3 }, // "cần chuyến xe"
   { pattern: /có\s+ai\s+tiện\s+chuyến/, weight: 3 }, // "có ai tiện chuyến"
-  { pattern: /ai\s+đi\s+ib\s+em/, weight: 3 }, // "ai đi ib em" — passenger asking anyone going to contact
   { pattern: /(?<!ai\s)cần\s+bao\s+\d{0,2}\s*xe/, weight: 3 }, // "cần bao xe", "cần bao 1 xe" (not "ai cần bao xe" which is a driver)
   { pattern: /(?<!\w)e\s+bao\s+xe/, weight: 3 }, // "e bao xe" (not the "e" at the end of "xe")
   { pattern: /báo\s+giá\s+bao\s+xe/, weight: 3 }, // "báo giá bao xe"
@@ -59,7 +61,7 @@ const PASSENGER_PATTERNS: WeightedPattern[] = [
   { pattern: /gọi\s+cho\s+mình/, weight: 2 }, // "gọi cho mình nhé" — informal, not a professional driver CTA
   { pattern: /muốn\s+tìm\s+\d*\s*xe/, weight: 3 }, // "muốn tìm 1 xe"
   { pattern: /mình\s+có\s+\d+\s+người\s+(?:cần|đi|muốn)/, weight: 3 }, // "mình có 1 người đi từ" — arranging for someone else
-  { pattern: /(?<!(?:ai|khách)\s)cần\s+xe/, weight: 2 }, // "cần xe" — need a car (not "ai cần xe" or "khách cần xe" which are driver phrases)
+  { pattern: /(?<!(?:ai|ace|khách)\s)cần\s+xe/, weight: 2 }, // "cần xe" — need a car (not "ai/ace/khách cần xe" which are driver phrases)
   { pattern: /cần\s+\d+\s+xe/, weight: 2 }, // "cần 1 xe"
   { pattern: /tìm\s+xe/, weight: 2 }, // "tìm xe"
   { pattern: /có\s+xe\s+nào/, weight: 2 }, // "có xe nào"
