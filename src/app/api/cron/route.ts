@@ -105,11 +105,7 @@ export async function GET(request: Request) {
       for (let j = 0; j < fbPosts.length; j++) {
         const fbPost = fbPosts[j];
 
-        const newPost = await buildPostEntity(
-          fromApi as FromApi,
-          fbPost,
-          anonymousUserId!,
-        );
+        const newPost = buildPostEntity(fromApi as FromApi, fbPost, anonymousUserId!,);
 
         // Skip posts without message
         if (!newPost.content) {
@@ -150,6 +146,8 @@ export async function GET(request: Request) {
             continue;
           }
         }
+
+        newPost.author_type = await detectPostType(newPost.content)
 
         try {
           const { error: insertError } = await supabase
@@ -287,7 +285,7 @@ function fetchFbPosts(fromApi: FromApi, groupId: string) {
   });
 }
 
-async function buildPostEntity(
+function buildPostEntity(
   fromApi: FromApi,
   fbPost: any,
   anonymousUserId: string,
@@ -297,9 +295,6 @@ async function buildPostEntity(
     case "facebook-scraper3":
       entity = {
         content: fbPost.message,
-        author_type: fbPost.message
-          ? await detectPostType(fbPost.message)
-          : "driver",
         author_name: fbPost.author?.name ?? null,
         user_id: anonymousUserId,
         facebook_url:
@@ -311,9 +306,6 @@ async function buildPostEntity(
     case "facebook-scraper-api4":
       entity = {
         content: fbPost.values?.text,
-        author_type: fbPost.values?.text
-          ? await detectPostType(fbPost.values?.text)
-          : "driver",
         author_name: fbPost.user_details?.name ?? null,
         user_id: anonymousUserId,
         facebook_url: fbPost.details?.post_link,
