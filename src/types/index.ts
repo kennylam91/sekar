@@ -41,3 +41,28 @@ export interface PostsResponse {
   pageSize: number;
   totalPages: number;
 }
+
+export interface CronJobLog {
+  id: string;
+  run_at: string;
+  api_source: string | null;
+  group_id: string | null;
+  total_fetched: number;
+  total_created: number;
+  total_skipped: number;
+  total_passenger_posts: number;
+  status: string;
+  duration_ms: number | null;
+  requests_limit: number | null;
+  requests_remaining: number | null;
+  created_at: string;
+}
+
+export interface FacebookGroup {
+  id: string;
+  group_id: string;
+  name: string | null;
+  member_count: number | null;
+  last_updated_at: string | null;
+  created_at: string;
+}
