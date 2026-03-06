@@ -216,6 +216,72 @@ chiều nay ai nhận ko ah`,
       "Sáng sớm t5 xe em từ HN về HL. Ai đi LH em giá góp xăng.0973603962",
       "driver",
     ],
+    [
+      `💥💥QUẢNG NINH  🔛   BẮC NINH         💥💥
+💥💥QUẢNG NINH  🔛   BẮC GIANG      💥💥
+💥💥QUẢNG NINH  🔛   THÁI NGUYÊN 💥💥
+ 🚐 Di Chuyển Bằng Xe 4 chỗ 7 Chỗ và Limousine 10 chỗ
+👉 Vé Ghép 300K đến 500K tuỳ vào điểm đón 👉 Bao Cả Xe 1500K đến 1800K
+—————————————————————
+🚗Quảng Ninh - Bắc Ninh - Bắc Giang - Thái Nguyên ( và ngược lại )
+👉🏻nhận đón trả khách tận nơi
+🎁 Nhận Gửi Đồ
+☎️ 0921020777   Zalo : 0921.020.777`,
+      "driver",
+    ],
+    [
+      "Hôm nay 6/3 mình có xe  tiện chuyến từ quảng ninh, hải phòng đi hà nội và ngược lại.  LH 0962974256",
+      "driver",
+    ],
+    [
+      `🇻🇳 𝐗𝐄 𝐆𝐇É𝐏 VĨNH YÊN 🇻🇳TAM ĐẢO
+𝐕Ĩ𝐍𝐇 𝐏𝐇Ú𝐂↔️ 𝐍Ộ𝐈 𝐁À𝐈↔️ 𝐇À 𝐍Ộ𝐈↔️ VĨNH PHÚC 
+
+        XE ĐIỆN CHẤT LƯỢNG CAO
+
+☎️ 𝐇𝐨𝐭𝐥𝐢𝐧𝐞 : 0869588495
+
+        📱ZALO 0869588495
+
+💸: 𝟏ng= 𝟐𝟎𝟎𝐤 🔜 𝟐ng= 𝟯𝟓𝟎𝐤 🔜 𝟯ng= 𝟒𝟎𝟎𝐤 ( Đón trả 𝟏 điểm )
+
+✅: Bao xe 5c = 𝟒𝟓𝟎𝐤 - 𝟓𝟎𝟎𝐤 TUỲ Điểm 
+
+🚘: Bao xe 7c = 550k - 700𝐤 TUỲ ĐIỂM
+
+🚙Hà nội - tt tam đảo ghép 350k 1ng -2ng500k 
+
+Bao xe 5c 700k - 7c 800k 
+
+🚚: 𝐒𝐇𝐈𝐏 𝐇À𝐍𝐆 𝐇𝐎Ả 𝐓Ố𝐂- Uy Tín. 𝟏𝟎𝟎𝐤
+
+⏰ : Xe chạy liên tục 𝟯𝟎p/chuyến. 
+
+Từ 𝟰h-𝟐𝟐h hàng ngày
+
+🚕 : 𝐓𝐀𝐗𝐈 đi 𝐧𝐠𝐨𝐚̀𝐢 𝐭𝐢̉𝐧𝐡. 𝟏0k/km
+
+          ☎️ 𝐇𝐨𝐭𝐥𝐢𝐧𝐞 : 0869588495`,
+      "driver",
+    ],
+    [
+      `Xe Ghép Hà Nội Hưng Yên Hải Dương Hải Phòng
+Xe nhà mình chạy các khung giờ
+
+Hà Nội - Hưng Yên - Hải Dương - Hải Phòng  và ngược lại...........
+
+Nhận ghép xe,bao xe,gửi đồ
+
+Liên hệ trực tiếp: 0911890616`,
+      "driver",
+    ],
+    [
+      `Xe Ghép Tiện Chuyến - 088.618.2345 /zalo
+- Bao xe từ 900k
+- Ghép từ 400k
+- Gửi hàng hỏa tốc từ 150k`,
+      "driver",
+    ],
   ] as const)("%s", async (input, expected) => {
     const actual = await detectPostType(input);
     expect(actual).toBe(expected);

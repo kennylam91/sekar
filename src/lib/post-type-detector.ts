@@ -31,6 +31,13 @@ const DRIVER_PATTERNS: WeightedPattern[] = [
   { pattern: /giá\s+chỉ\s+từ/, weight: 3 },
   { pattern: /tìm\s+người/, weight: 3 },
   { pattern: /tuyến\s+cố\s+định/, weight: 3 },
+  { pattern: /(?:mình|em|tôi)\s+có\s+xe\s+tiện\s+chuyến/, weight: 3 }, // "mình/em/tôi có xe tiện chuyến" — driver offering a convenient trip
+  { pattern: /nhận\s+đón\s+trả\s+khách/, weight: 3 }, // "nhận đón trả khách" — driver accepting pick-up/drop-off
+  { pattern: /nhận\s+gửi\s+đồ/, weight: 3 }, // "nhận gửi đồ" — driver accepting parcel deliveries
+  { pattern: /bao\s+cả\s+xe/, weight: 3 }, // "bao cả xe" — driver offering full charter
+  { pattern: /bao\s+xe\s+từ/, weight: 3 }, // "bao xe từ Xk" — driver listing charter prices
+  { pattern: /nhận\s+ghép\s+xe/, weight: 3 }, // "nhận ghép xe" — driver accepting shared-ride requests
+  { pattern: /xe\s+nhà\s+(?:mình|em)\s+chạy/, weight: 3 }, // "xe nhà mình/em chạy" — driver's business vehicle
 ];
 
 /**
@@ -163,7 +170,7 @@ async function classifyViaLLM(content: string): Promise<AuthorType | null> {
 export async function detectPostType(content: string): Promise<AuthorType> {
   if (!content || typeof content !== "string") return "driver";
 
-  const normalized = content.toLowerCase();
+  const normalized = content.normalize("NFKC").toLowerCase();
   const driverScore = score(normalized, DRIVER_PATTERNS);
   const passengerScore = score(normalized, PASSENGER_PATTERNS);
 
