@@ -14,7 +14,7 @@ const DRIVER_PATTERNS: WeightedPattern[] = [
   { pattern: /có\s+xe\s+trống/, weight: 3 },
   { pattern: /có\s+xe\s+ghép\s+từ/, weight: 3 }, // "có xe ghép từ X" — driver advertising a ride
   { pattern: /bác\s+nào\s+cần\s+xe/, weight: 3 }, // "bác nào cần xe" — driver seeking passengers
-  { pattern: /ai\s+cần\s+xe/, weight: 3 }, // "ai cần xe" — driver seeking passengers
+  { pattern: /(ai|ace)\s+cần\s+xe/, weight: 3 }, // "ai cần xe" — driver seeking passengers
   { pattern: /(?:mình|em)\s+có\s+xe\s+\d+\s+chỗ/, weight: 3 }, // "mình/em có xe 7 chỗ"
   { pattern: /có\s+xe\s+quay\s+đầu/, weight: 3 }, // "có xe quay đầu" — returning empty vehicle
   { pattern: /nhận\s+bao\s+xe/, weight: 3 }, // "nhận bao xe" — driver accepting charter bookings
@@ -56,6 +56,8 @@ const PASSENGER_PATTERNS: WeightedPattern[] = [
   { pattern: /cần\s+chuyến\s+xe/, weight: 3 }, // "cần chuyến xe"
   { pattern: /có\s+ai\s+tiện\s+chuyến/, weight: 3 }, // "có ai tiện chuyến"
   { pattern: /(?<!ai\s)cần\s+bao\s+\d{0,2}\s*xe/, weight: 3 }, // "cần bao xe", "cần bao 1 xe" (not "ai cần bao xe" which is a driver)
+  { pattern: /(?<!ai\s)cần\s+gửi/, weight: 3 }, // "cần gửi" (not "ai cần gửi" which is a driver)
+  { pattern: /(?<!ai\s)muốn\s+gửi/, weight: 3 }, // "muốn gửi" (not "ai cần muốn gửi" which is a driver)
   { pattern: /(?<!\w)e\s+bao\s+xe/, weight: 3 }, // "e bao xe" (not the "e" at the end of "xe")
   { pattern: /báo\s+giá\s+bao\s+xe/, weight: 3 }, // "báo giá bao xe"
   { pattern: /muốn\s+tìm\s+\d*\s*xe/, weight: 3 }, // "muốn tìm 1 xe"
@@ -69,6 +71,7 @@ const PASSENGER_PATTERNS: WeightedPattern[] = [
   { pattern: /báo\s+phí/, weight: 3 }, // "báo phí giúp" — asking for a price quote = passenger
   { pattern: /e\s+tìm\s+xe/, weight: 3 },
   { pattern: /e\s+cần\s+xe/, weight: 3 },
+  { pattern: /có\s+\d+người/, weight: 3 },
 ];
 
 /** Minimum score from a single weight-3 pattern to be considered a "strong" signal. */

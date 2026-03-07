@@ -18,6 +18,7 @@ export default function AdminPage() {
     totalPosts: 0,
     driverPosts: 0,
     passengerPosts: 0,
+    activeGroups: 0,
   });
 
   const fetchUser = useCallback(async () => {
@@ -29,20 +30,25 @@ export default function AdminPage() {
 
   const fetchStats = useCallback(async () => {
     try {
-      const [allRes, driverRes, passengerRes] = await Promise.all([
+      const [allRes, driverRes, passengerRes, groupsRes] = await Promise.all([
         fetch("/api/posts?page=1&filter=all"),
         fetch("/api/posts?page=1&filter=all&type=driver"),
         fetch("/api/posts?page=1&filter=all&type=passenger"),
+        fetch("/api/admin/facebook-groups"),
       ]);
-      const [allData, driverData, passengerData] = await Promise.all([
-        allRes.json(),
-        driverRes.json(),
-        passengerRes.json(),
-      ]);
+      const [allData, driverData, passengerData, groupsData] =
+        await Promise.all([
+          allRes.json(),
+          driverRes.json(),
+          passengerRes.json(),
+          groupsRes.json(),
+        ]);
+      const groups: { is_enabled: boolean }[] = groupsData.data ?? [];
       setStats({
         totalPosts: allData.total || 0,
         driverPosts: driverData.total || 0,
         passengerPosts: passengerData.total || 0,
+        activeGroups: groups.filter((g) => g.is_enabled).length,
       });
     } catch {
       console.error("Failed to fetch stats");
@@ -102,6 +108,19 @@ export default function AdminPage() {
           <p className="text-2xl font-bold text-green-900">
             {stats.passengerPosts}
           </p>
+        </div>
+        <div className="bg-green-50 rounded-xl border border-green-200 p-4">
+          <Link
+            href="/admin/facebook-groups"
+            className="flex flex-col items-start"
+          >
+            <p className="text-sm text-gray-500 m-0">
+              Nhóm Facebook đang hoạt động
+            </p>
+            <p className="text-2xl font-bold text-gray-900 m-0">
+              {stats.activeGroups}
+            </p>
+          </Link>
         </div>
       </div>
 
