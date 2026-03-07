@@ -170,8 +170,11 @@ async function classifyViaLLM(content: string): Promise<AuthorType | null> {
  * 2. Otherwise (ambiguous or conflicting signals) → call OpenRouter for
  *    classification, falling back to the score comparison on failure.
  */
-export async function detectPostType(content: string): Promise<AuthorType> {
-  if (!content || typeof content !== "string") return "driver";
+export async function detectPostType(
+  content: string,
+): Promise<{ type: AuthorType; usedLLM: boolean }> {
+  if (!content || typeof content !== "string")
+    return { type: "driver", usedLLM: false };
 
   const normalized = content.normalize("NFKC").toLowerCase();
   const driverScore = score(normalized, DRIVER_PATTERNS);
@@ -181,13 +184,17 @@ export async function detectPostType(content: string): Promise<AuthorType> {
   const passengerStrong = passengerScore >= STRONG_THRESHOLD;
 
   // Unambiguous strong signal — no LLM call needed.
-  if (driverStrong && !passengerStrong) return "driver";
-  if (passengerStrong && !driverStrong) return "passenger";
+  if (driverStrong && !passengerStrong) return { type: "driver", usedLLM: false };
+  if (passengerStrong && !driverStrong)
+    return { type: "passenger", usedLLM: false };
 
   // Ambiguous or no signal — defer to LLM.
   const llmResult = await classifyViaLLM(content);
-  if (llmResult !== null) return llmResult;
+  if (llmResult !== null) return { type: llmResult, usedLLM: true };
 
   // Final fallback: score comparison (ties → "driver").
-  return passengerScore > driverScore ? "passenger" : "driver";
+  return {
+    type: passengerScore > driverScore ? "passenger" : "driver",
+    usedLLM: false,
+  };
 }

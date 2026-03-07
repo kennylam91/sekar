@@ -176,7 +176,9 @@ export async function GET(request: Request) {
           }
         }
 
-        newPost.author_type = await detectPostType(newPost.content);
+        const detected = await detectPostType(newPost.content);
+        newPost.author_type = detected.type;
+        newPost.used_llm = detected.usedLLM;
 
         try {
           const { error: insertError } = await supabase

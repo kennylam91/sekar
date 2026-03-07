@@ -20,6 +20,7 @@ export interface Post {
   facebook_url: string | null;
   zalo_url: string | null;
   is_visible: boolean;
+  used_llm: boolean;
   created_at: string;
   updated_at: string;
   facebook_id?: string;
