@@ -25,6 +25,8 @@ interface PostListProps {
   initialTotalPages?: number;
   /** Initial data for SSR */
   initialData?: PostsResponse;
+  /** Increment to re-fetch the current page without remounting the component */
+  refreshToken?: number;
 }
 
 export default function PostList({
@@ -35,6 +37,7 @@ export default function PostList({
   currentUserId,
   onEdit,
   initialData,
+  refreshToken,
 }: PostListProps) {
   const [posts, setPosts] = useState<Post[]>(initialData?.posts || []);
   const [loading, setLoading] = useState(!initialData?.posts);
@@ -43,6 +46,7 @@ export default function PostList({
   const [totalPages, setTotalPages] = useState(initialData?.totalPages || 1);
   const [total, setTotal] = useState(initialData?.total || 0);
   const isFirstRender = useRef(true);
+  const prevRefreshToken = useRef(refreshToken);
 
   const fetchPosts = useCallback(async () => {
     setLoading(true);
@@ -77,6 +81,15 @@ export default function PostList({
     }
     fetchPosts();
   }, [fetchPosts, initialData]);
+
+  // Re-fetch current page when refreshToken changes (e.g. after editing a post)
+  // without remounting the component, so page state is preserved.
+  useEffect(() => {
+    if (prevRefreshToken.current === refreshToken) return;
+    prevRefreshToken.current = refreshToken;
+    fetchPosts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshToken]);
 
   // Refetch when the tab becomes visible again (e.g. after clicking a
   // push notification that focuses an already-open tab).

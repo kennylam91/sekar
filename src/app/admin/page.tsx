@@ -137,7 +137,6 @@ export default function AdminPage() {
             key={tab.value}
             onClick={() => {
               setActiveTab(tab.value);
-              setRefreshKey((k) => k + 1);
             }}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               activeTab === tab.value
@@ -175,7 +174,8 @@ export default function AdminPage() {
       {/* Posts list with admin controls */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 sm:p-6">
         <PostList
-          key={`${activeTab}-${refreshKey}`}
+          key={activeTab}
+          refreshToken={refreshKey}
           type={activeTab === "all" ? undefined : activeTab}
           showAdminControls
           onEdit={(post) => setEditingPost(post)}
