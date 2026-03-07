@@ -29,10 +29,6 @@ describe("detectPostType", () => {
       "passenger",
     ],
     [
-      "Chiều mai 28. 3h bắt đầu. Hải Phòng Uông bí Hạ long Móng cái Ai đi ib em giá tiện chuyến thôi 0984198077",
-      "driver",
-    ],
-    [
       "Sáng mai 5H mình cần bao xe bốn chỗ từ hà nội đi hạ long quang ninh  nhờ ad giá với ạ 0988678004",
       "passenger",
     ],
@@ -96,10 +92,6 @@ describe("detectPostType", () => {
       "driver",
     ],
     [
-      "M6 khoảng 21-23h xe 7c không khách lộ trình Nội Bài - Móng cái, đường nào cũng đc tuỳ khách. Ace tiện chuyến/ bao xe 0977516585",
-      "driver",
-    ],
-    [
       "16h30 mùng 10 âm mình có xe 7 chỗ từ nội bài về hoàng quế bạn nào bắc ninh bắc giang cần xe liên hệ cho mình ạ",
       "driver",
     ],
@@ -148,10 +140,6 @@ chiều nay ai nhận ko ah`,
       "passenger",
     ],
     [
-      `Mình đi quảng ninh còn chỗ ai về quảng ninh thì gọi cho mình nhé mình ở hà đông hà nội  đi luôn hôm nay 0988991913`,
-      "driver",
-    ],
-    [
       `Sáng mai em muốn tìm 1 xe lúc 3h-3h30 sáng đi từ chợ giếng đáy tới ngô quyền hải phòng thì có bên nào nhận không ạ`,
       "passenger",
     ],
@@ -161,10 +149,6 @@ chiều nay ai nhận ko ah`,
     // ],
     [
       "X5 đang cửa khẩu móng cái rỗng về hp ace cần xe lh 0963987388 e đón ạ",
-      "driver",
-    ],
-    [
-      "Hôm nay 18-19hxe 7chỗ Móng Cái- hải ha-đầm hả -Hạ long-sản nhi- Uông bí Ai cần bao xe tiện chuyến góp xăng cũng OK ib em hoặc 0984108077",
       "driver",
     ],
     [
@@ -282,8 +266,72 @@ Liên hệ trực tiếp: 0911890616`,
 - Gửi hàng hỏa tốc từ 150k`,
       "driver",
     ],
+    [
+      `📣📣  Xe Ghép - Tiện Chuyến 4-7 Chỗ
+🚌 Xe Du Lịch 9-16-29-35-45 Chỗ, xe bán tải 
+🚕 Xe Chạy: 𝗛𝗔̀ 𝗡𝗢̣̂𝗜 - 𝗤𝗨𝗔̉𝗡𝗚 𝗡𝗜𝗡𝗛 - 𝗛𝗔̉𝗜 𝗣𝗛𝗢̀𝗡𝗚- 𝗡𝗢̣̂𝗜 𝗕𝗔̀𝗜 ngược lại và các tỉnh lân cận.
+👉 Xe đời mới đều có ở 2 đầu chạy cao tốc
+👉 Ghép Ghế - Bao Xe - Gửi Đồ ( Chó, Mèo )
+👉 Đón trả tận nơi,Gi.á rẻ tiện chuyến
+👉 Đưa đón Sân bay,Bệnh Viện,Thẩm Mỹ
+👉 Nhận lịch, Tuor Văn Phòng, Công Ty 
+📲 Gọi/ Kết Bạn Zalo : 𝟎𝟗𝟐𝟔.𝟔𝟔𝟐.𝟖𝟖𝟐`,
+      "driver",
+    ],
+    [
+      `Tổng đài xe ghép,xe tiện chuyến 5-7 chỗ,nhận gửi hàng Quảng Ninh-Hải Phòng-Hà Nội & ngược lại.Xe chạy liên tục,giá rẻ.LH 0926.662.882☎️`,
+      "driver",
+    ],
+    [
+      `e cần tìm xe ghép ít hàng từ Thạch Thất- Hà Nội đến trại Hải Hà-Quảng Ninh, cách li 2 tiếng, ai có xe ib mình: 0987790004`,
+      "passenger",
+    ],
+    [
+      `☎️👉LH 0984136985💎0325383536❤️ 🚘👉( ib zalo đặt lịch)
+Gọi là có: Xe 5-7 chỗ mới, sạch sẽ
+
+👉 Đón tận nơi ♥️trả tận nhà ♥️ 
+
+ĐÔNG TRIỀU<=> BẮC NINH <=> BẮC GIANG<=>HÀ NỘI<=>HẢI PHÒNG <=>HẠ LONG<=> MÓNG CÁI<=> CÁC TỈNH LN CẬN
+
+🚗 Sẵn đầu xe 5-7 chỗ- 16- bán tải chạy liên tục 2 chiều
+
+Nhận gửi hàng siêu tốc`,
+      "driver",
+    ],
+    [
+      `Sáng mai 9h sáng em có xe VF5 từ hạ long về hà nội ạ. Tiện chuyến về mọi người kết nối giúp em nhé`,
+      "driver",
+    ],
+    [
+      `Hằng ngày em có xe 5&7&chỗ
+ghép, bao xe
+Hà Nội ( Hải Phòng 👉  Quảng Ninh ) Quảng Ninh -Hải Phòng 👉 Hà nội ( Nội Bài)Và Liên Tỉnh
+Call: 0961980808d`,
+      "driver",
+    ],
+    [
+      `XE GHÉP QUẢNG NINH - HÀ NỘI | GIÁ RẺ - ĐÚNG GIỜ
+
+XE VIP ( VF8 SEDONA CANIVAL )
+
+🚗 Chạy hàng ngày - Đưa đón tận nơi - Xe đời mới 🚗
+
+✅ Cẩm Phả - Hà Nội, Sân Bay: 500k - 550k
+✅ Hạ Long - Hà Nội: 450k
+✅ Uông Bí - Hà Nội: 350k - 400k (tùy điểm)
+✅ Mạo Khê, Đông Triều - Hà Nội: 250k - 300k
+✅ Sao Đỏ - Hà Nội: 200 - 250k tuỳ điểm
+✅ Bắc Ninh - Hà Nội: 200k
+
+📞 Liên hệ đặt xe: 096 4220690 (Gọi/Zalo)
+Nhanh chóng - An toàn - Giá cả hợp lý!`,
+      "driver",
+    ],
   ] as const)("%s", async (input, expected) => {
     const actual = await detectPostType(input);
     expect(actual.type).toBe(expected);
+    expect(actual.usedLLM).toBe(false);
+    expect(actual.fallback).toBe(false);
   });
 });

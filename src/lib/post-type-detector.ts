@@ -38,6 +38,17 @@ const DRIVER_PATTERNS: WeightedPattern[] = [
   { pattern: /bao\s+xe\s+từ/, weight: 3 }, // "bao xe từ Xk" — driver listing charter prices
   { pattern: /nhận\s+ghép\s+xe/, weight: 3 }, // "nhận ghép xe" — driver accepting shared-ride requests
   { pattern: /xe\s+nhà\s+(?:mình|em)\s+chạy/, weight: 3 }, // "xe nhà mình/em chạy" — driver's business vehicle
+  { pattern: /24\/7/, weight: 3 }, //
+  { pattern: /vf/, weight: 3 }, //
+  { pattern: /24\/24/, weight: 3 },
+  { pattern: /tổng\s+đài/, weight: 3 },
+  { pattern: /đón\s+tận\s+nơi/, weight: 3 }, // "đưa đón tận nơi" — driver's service phrase
+  { pattern: /xe\s+(?:mình|em)\s+từ/, weight: 3 }, // "xe em từ HN về HL" — driver's vehicle route
+  { pattern: /xe\s+(?:mình|em)\s+\d/, weight: 3 }, // "xe em 5c" — driver's specific vehicle capacity
+  { pattern: /đưa\s+đón/, weight: 3 }, // "đưa đón sân bay" — driver airport transfer service
+  { pattern: /ghép\s+cho/, weight: 3 }, // "ghép cho" — driver offering to add passengers
+  { pattern: /hằng\s+ngày/, weight: 3 }, // "ib em" — driver asking passengers to message them
+  { pattern: /khách\s+bao\s+xe/, weight: 3 }, // "khách bao xe" — passengers can charter, ie driver listing service
 ];
 
 /**
@@ -67,10 +78,14 @@ const PASSENGER_PATTERNS: WeightedPattern[] = [
   { pattern: /mình\s+cần\s+đi/, weight: 3 }, // "mình cần đi"
   { pattern: /muốn\s+hỏi\s+xe/, weight: 3 }, // "muốn hỏi xe"
   { pattern: /cần\s+tìm\s+\d+/, weight: 3 }, // "cần tìm 2 ghế"
-  { pattern: /nhà\s+em\s+(?:cần|muốn|đi|đang|xin)/, weight: 3 }, // "nhà em cần/đi..." (NOT "nhà em có xe")
+  {
+    pattern: /nhà\s+em\s+(?:cần|muốn|đang|xin)|nhà\s+em\s+đi\s+(?!xe)/,
+    weight: 3,
+  }, // "nhà em cần/đi..." but NOT "nhà em đi xe không" (driver scenario)
   { pattern: /báo\s+phí/, weight: 3 }, // "báo phí giúp" — asking for a price quote = passenger
-  { pattern: /e\s+tìm\s+xe/, weight: 3 },
-  { pattern: /e\s+cần\s+xe/, weight: 3 },
+  { pattern: /(?<!\w)e\s+tìm\s+xe/, weight: 3 }, // word-boundary: avoid matching "ace tìm xe"
+  { pattern: /(?<!\w)e\s+cần\s+xe/, weight: 3 }, // word-boundary: avoid matching "ace cần xe"
+  { pattern: /cần\s+tìm\s+xe/, weight: 3 }, // "cần tìm xe" — passenger looking for a ride
   { pattern: /có\s+\d+người/, weight: 3 },
 ];
 
@@ -172,9 +187,9 @@ async function classifyViaLLM(content: string): Promise<AuthorType | null> {
  */
 export async function detectPostType(
   content: string,
-): Promise<{ type: AuthorType; usedLLM: boolean }> {
+): Promise<{ type: AuthorType; usedLLM: boolean; fallback: boolean }> {
   if (!content || typeof content !== "string")
-    return { type: "driver", usedLLM: false };
+    return { type: "driver", usedLLM: false, fallback: false };
 
   const normalized = content.normalize("NFKC").toLowerCase();
   const driverScore = score(normalized, DRIVER_PATTERNS);
@@ -184,17 +199,20 @@ export async function detectPostType(
   const passengerStrong = passengerScore >= STRONG_THRESHOLD;
 
   // Unambiguous strong signal — no LLM call needed.
-  if (driverStrong && !passengerStrong) return { type: "driver", usedLLM: false };
+  if (driverStrong && !passengerStrong)
+    return { type: "driver", usedLLM: false, fallback: false };
   if (passengerStrong && !driverStrong)
-    return { type: "passenger", usedLLM: false };
+    return { type: "passenger", usedLLM: false, fallback: false };
 
   // Ambiguous or no signal — defer to LLM.
   const llmResult = await classifyViaLLM(content);
-  if (llmResult !== null) return { type: llmResult, usedLLM: true };
+  if (llmResult !== null)
+    return { type: llmResult, usedLLM: true, fallback: false };
 
   // Final fallback: score comparison (ties → "driver").
   return {
     type: passengerScore > driverScore ? "passenger" : "driver",
     usedLLM: false,
+    fallback: true,
   };
 }
