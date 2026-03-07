@@ -46,6 +46,7 @@ export default function PostList({
   const [totalPages, setTotalPages] = useState(initialData?.totalPages || 1);
   const [total, setTotal] = useState(initialData?.total || 0);
   const isFirstRender = useRef(true);
+  const containerRef = useRef<HTMLDivElement>(null);
   const prevRefreshToken = useRef(refreshToken);
 
   const fetchPosts = useCallback(async () => {
@@ -108,6 +109,12 @@ export default function PostList({
   const handleFilterChange = (newFilter: PostFilter) => {
     setFilter(newFilter);
     setPage(1);
+    containerRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    containerRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   const handleToggleVisibility = async (id: string, visible: boolean) => {
@@ -141,7 +148,7 @@ export default function PostList({
   };
 
   return (
-    <div>
+    <div ref={containerRef}>
       <div className="flex items-center justify-between gap-4 mb-4">
         <FilterBar activeFilter={filter} onFilterChange={handleFilterChange} />
         <span className="text-xs text-gray-400 shrink-0">{total} bài đăng</span>
@@ -200,7 +207,7 @@ export default function PostList({
         </div>
       )}
 
-      <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+      <Pagination page={page} totalPages={totalPages} onPageChange={handlePageChange} />
     </div>
   );
 }
