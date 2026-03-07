@@ -176,6 +176,8 @@ export async function GET(request: Request) {
           }
         }
 
+        newPost.author_type = await detectPostType(newPost.content);
+
         try {
           const { error: insertError } = await supabase
             .from("posts")
@@ -333,7 +335,6 @@ function buildPostEntity(
     case "facebook-scraper3":
       entity = {
         content: fbPost.message,
-        author_type: fbPost.message ? detectPostType(fbPost.message) : "driver",
         author_name: fbPost.author?.name ?? null,
         user_id: anonymousUserId,
         facebook_url:
@@ -346,9 +347,6 @@ function buildPostEntity(
     case "facebook-scraper-api4":
       entity = {
         content: fbPost.values?.text,
-        author_type: fbPost.values?.text
-          ? detectPostType(fbPost.values?.text)
-          : "driver",
         author_name: fbPost.user_details?.name ?? null,
         user_id: anonymousUserId,
         facebook_url: fbPost.details?.post_link,

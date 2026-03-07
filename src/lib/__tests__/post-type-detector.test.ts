@@ -1,4 +1,4 @@
-﻿import { describe, it, expect } from "vitest";
+﻿import { describe, it, vi, expect } from "vitest";
 import { detectPostType } from "../post-type-detector";
 
 describe("detectPostType", () => {
@@ -30,7 +30,7 @@ describe("detectPostType", () => {
     ],
     [
       "Chiều mai 28. 3h bắt đầu. Hải Phòng Uông bí Hạ long Móng cái Ai đi ib em giá tiện chuyến thôi 0984198077",
-      "passenger",
+      "driver",
     ],
     [
       "Sáng mai 5H mình cần bao xe bốn chỗ từ hà nội đi hạ long quang ninh  nhờ ad giá với ạ 0988678004",
@@ -149,7 +149,7 @@ chiều nay ai nhận ko ah`,
     ],
     [
       `Mình đi quảng ninh còn chỗ ai về quảng ninh thì gọi cho mình nhé mình ở hà đông hà nội  đi luôn hôm nay 0988991913`,
-      "passenger",
+      "driver",
     ],
     [
       `Sáng mai em muốn tìm 1 xe lúc 3h-3h30 sáng đi từ chợ giếng đáy tới ngô quyền hải phòng thì có bên nào nhận không ạ`,
@@ -161,7 +161,7 @@ chiều nay ai nhận ko ah`,
     ],
     [
       "X5 đang cửa khẩu móng cái rỗng về hp ace cần xe lh 0963987388 e đón ạ",
-      "passenger",
+      "driver",
     ],
     [
       "Hôm nay 18-19hxe 7chỗ Móng Cái- hải ha-đầm hả -Hạ long-sản nhi- Uông bí Ai cần bao xe tiện chuyến góp xăng cũng OK ib em hoặc 0984108077",
@@ -212,7 +212,78 @@ chiều nay ai nhận ko ah`,
       "Hàng ngày nhà xe vẫn có xe 5 chỗ & 7 chỗ tiện chuyến: Hà Nội-Thái Bình - Hải Phòng - Quảng Ninh.  Các bác cần cứ liên hệ đặt xe sớm ạ.  Rất vui phục vụ các bác: 0865322662-0865292662",
       "driver",
     ],
-  ] as const)("%s", (input, expected) => {
-    expect(detectPostType(input)).toBe(expected);
+    [
+      "Sáng sớm t5 xe em từ HN về HL. Ai đi LH em giá góp xăng.0973603962",
+      "driver",
+    ],
+    [
+      `💥💥QUẢNG NINH  🔛   BẮC NINH         💥💥
+💥💥QUẢNG NINH  🔛   BẮC GIANG      💥💥
+💥💥QUẢNG NINH  🔛   THÁI NGUYÊN 💥💥
+ 🚐 Di Chuyển Bằng Xe 4 chỗ 7 Chỗ và Limousine 10 chỗ
+👉 Vé Ghép 300K đến 500K tuỳ vào điểm đón 👉 Bao Cả Xe 1500K đến 1800K
+—————————————————————
+🚗Quảng Ninh - Bắc Ninh - Bắc Giang - Thái Nguyên ( và ngược lại )
+👉🏻nhận đón trả khách tận nơi
+🎁 Nhận Gửi Đồ
+☎️ 0921020777   Zalo : 0921.020.777`,
+      "driver",
+    ],
+    [
+      "Hôm nay 6/3 mình có xe  tiện chuyến từ quảng ninh, hải phòng đi hà nội và ngược lại.  LH 0962974256",
+      "driver",
+    ],
+    [
+      `🇻🇳 𝐗𝐄 𝐆𝐇É𝐏 VĨNH YÊN 🇻🇳TAM ĐẢO
+𝐕Ĩ𝐍𝐇 𝐏𝐇Ú𝐂↔️ 𝐍Ộ𝐈 𝐁À𝐈↔️ 𝐇À 𝐍Ộ𝐈↔️ VĨNH PHÚC 
+
+        XE ĐIỆN CHẤT LƯỢNG CAO
+
+☎️ 𝐇𝐨𝐭𝐥𝐢𝐧𝐞 : 0869588495
+
+        📱ZALO 0869588495
+
+💸: 𝟏ng= 𝟐𝟎𝟎𝐤 🔜 𝟐ng= 𝟯𝟓𝟎𝐤 🔜 𝟯ng= 𝟒𝟎𝟎𝐤 ( Đón trả 𝟏 điểm )
+
+✅: Bao xe 5c = 𝟒𝟓𝟎𝐤 - 𝟓𝟎𝟎𝐤 TUỲ Điểm 
+
+🚘: Bao xe 7c = 550k - 700𝐤 TUỲ ĐIỂM
+
+🚙Hà nội - tt tam đảo ghép 350k 1ng -2ng500k 
+
+Bao xe 5c 700k - 7c 800k 
+
+🚚: 𝐒𝐇𝐈𝐏 𝐇À𝐍𝐆 𝐇𝐎Ả 𝐓Ố𝐂- Uy Tín. 𝟏𝟎𝟎𝐤
+
+⏰ : Xe chạy liên tục 𝟯𝟎p/chuyến. 
+
+Từ 𝟰h-𝟐𝟐h hàng ngày
+
+🚕 : 𝐓𝐀𝐗𝐈 đi 𝐧𝐠𝐨𝐚̀𝐢 𝐭𝐢̉𝐧𝐡. 𝟏0k/km
+
+          ☎️ 𝐇𝐨𝐭𝐥𝐢𝐧𝐞 : 0869588495`,
+      "driver",
+    ],
+    [
+      `Xe Ghép Hà Nội Hưng Yên Hải Dương Hải Phòng
+Xe nhà mình chạy các khung giờ
+
+Hà Nội - Hưng Yên - Hải Dương - Hải Phòng  và ngược lại...........
+
+Nhận ghép xe,bao xe,gửi đồ
+
+Liên hệ trực tiếp: 0911890616`,
+      "driver",
+    ],
+    [
+      `Xe Ghép Tiện Chuyến - 088.618.2345 /zalo
+- Bao xe từ 900k
+- Ghép từ 400k
+- Gửi hàng hỏa tốc từ 150k`,
+      "driver",
+    ],
+  ] as const)("%s", async (input, expected) => {
+    const actual = await detectPostType(input);
+    expect(actual).toBe(expected);
   });
 });
