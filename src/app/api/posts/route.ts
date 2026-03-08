@@ -3,6 +3,13 @@ import { supabase } from "@/lib/supabase";
 import { getCurrentUser } from "@/lib/auth";
 import { notifyDriversOfNewPost } from "@/lib/notifications";
 import { fetchPosts } from "@/lib/posts";
+import {
+  DRIVER_RATE_LIMIT_MS,
+  PASSENGER_RATE_LIMIT_MS,
+  checkPassengerRateLimit,
+  getClientIp,
+  recordPassengerPost,
+} from "@/lib/rate-limit";
 import type { PostFilter } from "@/types";
 
 const MIN_CONTENT_LENGTH = 20;
@@ -57,6 +64,38 @@ export async function POST(request: NextRequest) {
 
     const user = await getCurrentUser();
 
+    // Rate limiting
+    if (user && user.role === "driver") {
+      // Driver: allow 1 post per 15 minutes, checked via the database
+      const since = new Date(Date.now() - DRIVER_RATE_LIMIT_MS).toISOString();
+      const { count } = await supabase
+        .from("posts")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user.userId)
+        .gte("created_at", since);
+
+      if (count && count > 0) {
+        return NextResponse.json(
+          { error: "Bạn chỉ có thể đăng bài 1 lần mỗi 15 phút" },
+          { status: 429 },
+        );
+      }
+    } else {
+      // Passenger: allow 1 post per 30 minutes, checked via in-memory store
+      const ip = getClientIp(request);
+      const remainingMs = checkPassengerRateLimit(ip);
+      if (remainingMs > 0) {
+        const limitMinutes = PASSENGER_RATE_LIMIT_MS / (60 * 1000);
+        const remainingMinutes = Math.ceil(remainingMs / (60 * 1000));
+        return NextResponse.json(
+          {
+            error: `Bạn chỉ có thể đăng bài 1 lần mỗi ${limitMinutes} phút. Vui lòng thử lại sau ${remainingMinutes} phút.`,
+          },
+          { status: 429 },
+        );
+      }
+    }
+
     let postData;
     if (user && user.role === "driver") {
       // Driver post
@@ -105,6 +144,8 @@ export async function POST(request: NextRequest) {
 
     // Notify drivers if this is a passenger post
     if (postData.author_type === "passenger") {
+      // Record the post for rate limiting before notifying
+      recordPassengerPost(getClientIp(request));
       // Fire and forget — don't block the response
       await notifyDriversOfNewPost(postData.content).catch(console.error);
     }
