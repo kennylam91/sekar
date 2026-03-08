@@ -326,6 +326,38 @@ XE VIP ( VF8 SEDONA CANIVAL )
 Nhanh chóng - An toàn - Giá cả hợp lý!`,
       "driver",
     ],
+    [
+      `Trưa hnay 8/3 e có xe 5 chỗ hạ long đi thái bình, giá tiện chuyến 0986808532`,
+      "driver",
+    ],
+    [`Em cần xe 23h tối nay HN về QN 2 người`, "passenger"],
+    [`🚛 𝑽𝒂̣̂𝒏 𝑻𝒂̉𝒊 𝑪𝒖̛𝒐̛̀𝒏𝒈 𝑻𝒉𝒊̣𝒏𝒉 🚛
+✔️Nhận chở hàng chuyên tuyến : 🌱
+𝙃𝒂̀ 𝑵𝙤̣̂𝒊 - 𝑯𝙖̉𝒊 𝑫𝙪̛𝒐̛𝙣𝒈 - 𝑸𝙪𝒂̉𝙣𝒈 𝑵𝙞𝒏𝙝 - 𝙈𝒐́𝙣𝒈 𝑪𝙖́𝒊 📣
+* 𝘟𝑒 𝑐𝘩𝑎̣𝘺 đ𝑒̂̀𝘶 𝘤𝑎́𝘤 𝘯𝑔𝘢̀𝑦 🅿️ 𝘹𝑒 𝑔𝘰𝑚 𝑑𝑜̣𝑐 đ𝑢̛𝑜̛̀𝑛𝑔 𝘘𝐿5 ✅ 
+
+📞: 𝟬𝟯𝟱𝟵.𝟬𝟭𝟭.𝟲𝟳𝟴 - 𝟬𝟯𝟵𝟰.𝟭𝟱.𝟲𝟲𝟲𝟲 📲
+ʚɞ 𝐴𝘊𝐸 𝑐𝘰́ 𝘩𝑎̀𝘯𝑔 𝑎𝘭𝑜 𝑒𝘮 𝘯ℎ𝘦́ 𝘹𝑒 𝑛𝘩𝑎̀ 𝟐,𝟓-𝟕 𝘵𝑎̂́𝘯 👣
+#xetaighep_xeghephang`, "driver"],
+[`9h - 13h. Ngày 8/3  em có xe 7c Tiện chuyến từ  Vân Đồn _ Hạ Long _  Quảng Yên _ Uông Bí _ Đông triều _ Hải Dương _ Bắc Ninh _ Hà Nội - Sân Bay Nội Bài. Mn góp xăng .0398922984`, "driver"],
+[`💥 Đặt xe nhanh 💥 0931.686.682
+👉 Quảng Ninh <=> Hải Phòng
+👉 Quảng Ninh <=> Hà Nội
+👉 Hải Phòng <=> Hà Nội
+🚘 Xe 5 chỗ, 7 chỗ chạy tất cả các ngày trong tuần
+💥 Bao xe, ghép xe, gửi đồ
+✅ Đón trả tận nơi
+☎️: 0931.686.682`, 'driver'],
+[`Chiều nay 8/3, tầm 2h có xe 7c trống từ Vân Đồn đi Thái Bình, ai tiện chuyến giá rẻ liên hệ:
+☎️0392166940`, 'driver'],
+[`Từ giờ tới 12h có chuyến nào từ nguyễn khuyến hà đông về vân đồn quảng ninh ko ạ e xin sdt với`, 'passenger'],
+[`Chiều mai thứ hai mình có xe gđ 7c trống từ Tb đi uông bí ai đi cùng alo mình đón giá tiện chuyến đt 0359894271`, 'driver'],
+[`Mai ngày 09/03 em có việc nên đi xe rỗng từ Hạ Long - Bắc Ninh và quay ngược về. Có bác nào muốn đi ghép tiện chyến giá rẻ không ạ?`, 'driver'],
+[`14-15h chiều nay cần xe 7 chỗ từ đông triều về quang hanh ai có xe liên hệ nhé ( 0866419568)`, 'passenger'],
+[`Tìm xe chiều nay 8/3 chạy Hạ Long - Hà Nội. 16h00 có mặt ở Hà Nội.`, 'passenger'],
+[`8/3 khung giờ 13h-14h x5 rỗng hl về đôg triều tiện chuyến giá rẻ 0567546888`, 'driver'],
+[`em cần xe đi cửa ông - quảng yên luôn chiều nay. ai đi ib em với ạ`, 'passenger'],
+[`Mai e có xe 5 chỗ từ quảng ninh về sơn la . Ai về cùng e lấy giá tiện chuyến thôi ạ 0326660336`, 'driver']
   ] as const)("%s", async (input, expected) => {
     const actual = await detectPostType(input);
     expect(actual.type).toBe(expected);
