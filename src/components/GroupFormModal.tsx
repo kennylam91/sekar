@@ -19,6 +19,14 @@ const emptyForm = (): FormData => ({
   note: "",
 });
 
+const routeOptions = (
+  (process.env.NEXT_PUBLIC_ROUTE_OPTIONS ?? "")
+    .split("\n")
+    .map((value) => value.split(",")).flat()
+    .map((value) => value.trim().toUpperCase())
+    .filter((value) => value)
+);
+
 type Props = {
   open: boolean;
   editingGroup: FacebookGroup | null;
@@ -35,6 +43,12 @@ export default function GroupFormModal({
   const [form, setForm] = useState<FormData>(emptyForm());
   const [formError, setFormError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [selectedRoutes, setSelectedRoutes] = useState<string[]>([]);
+
+  function handleRoutesChange(event: React.ChangeEvent<HTMLSelectElement>) {
+    const options = Array.from(event.target.selectedOptions, (opt) => opt.value);
+    setSelectedRoutes(options);
+  }
 
   useEffect(() => {
     if (!open) return;
@@ -47,8 +61,10 @@ export default function GroupFormModal({
         total_members: String(editingGroup.total_members),
         note: editingGroup.note ?? "",
       });
+      setSelectedRoutes(editingGroup.routes);
     } else {
       setForm(emptyForm());
+      setSelectedRoutes([]);
     }
   }, [open, editingGroup]);
 
@@ -63,6 +79,7 @@ export default function GroupFormModal({
       posts_in_last_month: parseInt(form.posts_in_last_month) || 0,
       total_members: parseInt(form.total_members) || 0,
       note: form.note.trim() || null,
+      routes: selectedRoutes,
     };
 
     try {
@@ -161,6 +178,32 @@ export default function GroupFormModal({
               />
             </div>
           </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Tuyến 
+            </label>
+            <select
+              multiple
+              value={selectedRoutes}
+              onChange={handleRoutesChange}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 h-auto"
+            >
+              {routeOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+            {routeOptions.length === 0 && (
+              <p className="text-xs text-red-500 mt-1">
+                Chưa cấu hình tuyến nào (NEXT_PUBLIC_ROUTE_OPTIONS).
+              </p>
+            )}
+            <p className="text-xs text-gray-500 mt-1">
+              Giữ phím Ctrl/Cmd để chọn nhiều tuyến.
+            </p>
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Ghi chú

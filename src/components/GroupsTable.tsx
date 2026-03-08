@@ -30,6 +30,7 @@ export default function GroupsTable({
             <th className="pb-2 pr-3 text-right whitespace-nowrap">
               Thành viên
             </th>
+            <th className="pb-2 pr-3">Tuyến</th>
             <th className="pb-2 pr-3">Ghi chú</th>
             <th className="pb-2 pr-3 text-center">Kích hoạt</th>
             <th className="pb-2 text-right">Thao tác</th>
@@ -56,6 +57,9 @@ export default function GroupsTable({
               </td>
               <td className="py-2.5 pr-3 text-right text-gray-600">
                 {g.total_members.toLocaleString()}
+              </td>
+              <td className="py-2.5 pr-3 text-gray-500 text-sm max-w-[200px] whitespace-nowrap overflow-hidden text-ellipsis">
+                {g.routes?.length > 0 ? g.routes.join(", ") : "—"}
               </td>
               <td className="py-2.5 pr-3 text-gray-500 max-w-[180px] truncate">
                 {g.note || "—"}

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
+import { normalizeRoutesArray } from "@/lib/routes";
 
 export async function GET() {
   try {
@@ -39,8 +40,14 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { facebook_id, name, posts_in_last_month, total_members, note } =
-      body;
+    const {
+      facebook_id,
+      name,
+      posts_in_last_month,
+      total_members,
+      note,
+      routes,
+    } = body;
 
     if (!facebook_id?.trim()) {
       return NextResponse.json(
@@ -63,6 +70,7 @@ export async function POST(request: Request) {
         posts_in_last_month: posts_in_last_month ?? 0,
         total_members: total_members ?? 0,
         note: note?.trim() || null,
+        routes: normalizeRoutesArray(routes),
       })
       .select()
       .single();
