@@ -5,6 +5,7 @@ import { Post } from "@/types";
 import { supabase } from "@/lib/supabase";
 import { notifyDriversOfNewPost } from "@/lib/notifications";
 import { extractPhone } from "@/lib/posts";
+import { normalizeRoutesArray } from "@/lib/routes";
 
 type FromApi = "facebook-scraper3" | "facebook-scraper-api4";
 
@@ -33,11 +34,11 @@ export async function GET(request: Request) {
   const anonymousUserId = process.env.NEXT_ANONYMOUS_USER_ID;
 
   // Load Facebook groups from DB (falls back to env variable if table is empty)
-  type GroupEntry = { facebook_id: string };
+  type GroupEntry = { facebook_id: string; routes: string[] };
   let groups: GroupEntry[] = [];
   const { data: dbGroups, error: dbGroupsError } = await supabase
     .from("facebook_groups")
-    .select("facebook_id")
+    .select("facebook_id, routes")
     .eq("is_enabled", true)
     .order("created_at", { ascending: true });
 
@@ -46,8 +47,9 @@ export async function GET(request: Request) {
   }
 
   if (dbGroups && dbGroups.length > 0) {
-    groups = dbGroups.map((g: { facebook_id: string }) => ({
+    groups = dbGroups.map((g: { facebook_id: string; routes?: string[] }) => ({
       facebook_id: g.facebook_id,
+      routes: normalizeRoutesArray(g.routes ?? []),
     }));
     console.log(`📋 Loaded ${groups.length} Facebook groups from database`);
   } else {
@@ -70,6 +72,7 @@ export async function GET(request: Request) {
   let totalSkippedPosts = 0;
   let totalFailedInserts = 0;
   let totalPassengerPosts = 0;
+  const createdPassengerRouteSet = new Set<string>();
   const groupResults: any[] = [];
 
   // Use for...of instead of forEach to properly await async operations
@@ -134,6 +137,7 @@ export async function GET(request: Request) {
           fbPost,
           anonymousUserId!,
           group.facebook_id,
+          group.routes,
         );
 
         // Skip posts without message
@@ -215,6 +219,9 @@ export async function GET(request: Request) {
             );
             if (newPost.author_type === "passenger") {
               totalPassengerPosts++;
+              for (const route of normalizeRoutesArray(newPost.routes ?? [])) {
+                createdPassengerRouteSet.add(route);
+              }
             }
             if (newPost.author_name) {
               createdAuthorNames.add(newPost.author_name);
@@ -283,6 +290,7 @@ export async function GET(request: Request) {
     );
     await notifyDriversOfNewPost(
       `Có ${totalPassengerPosts} khách mới tìm xe trên Sekar! 🚗💨`,
+      Array.from(createdPassengerRouteSet),
     );
   }
 
@@ -331,6 +339,7 @@ function buildPostEntity(
   fbPost: any,
   anonymousUserId: string,
   groupId: string,
+  groupRoutes: string[],
 ) {
   let entity: Partial<Post>;
   switch (fromApi) {
@@ -343,6 +352,7 @@ function buildPostEntity(
           fbPost.url ?? normalizeFacebookUrl(fbPost.author?.url) ?? null,
         facebook_id: fbPost.post_id ?? null,
         group_id: groupId,
+        routes: normalizeRoutesArray(groupRoutes),
         phone: extractPhone(fbPost.message),
       };
       break;
@@ -354,6 +364,7 @@ function buildPostEntity(
         facebook_url: fbPost.details?.post_link,
         facebook_id: fbPost.details?.post_id,
         group_id: groupId,
+        routes: normalizeRoutesArray(groupRoutes),
         phone: extractPhone(fbPost.values?.text),
       };
       break;

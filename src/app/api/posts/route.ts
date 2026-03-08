@@ -106,7 +106,9 @@ export async function POST(request: NextRequest) {
     // Notify drivers if this is a passenger post
     if (postData.author_type === "passenger") {
       // Fire and forget — don't block the response
-      await notifyDriversOfNewPost(postData.content).catch(console.error);
+      await notifyDriversOfNewPost(postData.content, post.routes ?? []).catch(
+        console.error,
+      );
     }
 
     return NextResponse.json({ post }, { status: 201 });
