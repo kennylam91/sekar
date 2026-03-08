@@ -20,9 +20,11 @@ export interface Post {
   facebook_url: string | null;
   zalo_url: string | null;
   is_visible: boolean;
+  used_llm: boolean;
   created_at: string;
   updated_at: string;
   facebook_id?: string;
+  group_id?: string | null;
 }
 
 export interface JWTPayload {
@@ -33,6 +35,18 @@ export interface JWTPayload {
 }
 
 export type PostFilter = "all" | "today" | "2days" | "week";
+
+export interface FacebookGroup {
+  id: string;
+  facebook_id: string;
+  name: string;
+  is_enabled: boolean;
+  posts_in_last_month: number;
+  total_members: number;
+  note: string | null;
+  created_at: string;
+  updated_at: string;
+}
 
 export interface PostsResponse {
   posts: Post[];

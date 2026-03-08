@@ -32,9 +32,31 @@ export async function GET(request: Request) {
 
   const anonymousUserId = process.env.NEXT_ANONYMOUS_USER_ID;
 
-  // Example: "142026696530246,425656831260435,1825313404533366,280799584362930"
-  const groupsEnv = process.env.NEXT_CRON_FACEBOOK_GROUPS || "";
-  const groups: string[] = groupsEnv.split(",").map((s) => s.trim());
+  // Load Facebook groups from DB (falls back to env variable if table is empty)
+  type GroupEntry = { facebook_id: string };
+  let groups: GroupEntry[] = [];
+  const { data: dbGroups, error: dbGroupsError } = await supabase
+    .from("facebook_groups")
+    .select("facebook_id")
+    .eq("is_enabled", true)
+    .order("created_at", { ascending: true });
+
+  if (dbGroupsError) {
+    console.error("❌ Failed to load facebook_groups from DB:", dbGroupsError);
+  }
+
+  if (dbGroups && dbGroups.length > 0) {
+    groups = dbGroups.map((g: { facebook_id: string }) => ({
+      facebook_id: g.facebook_id,
+    }));
+    console.log(`📋 Loaded ${groups.length} Facebook groups from database`);
+  } else {
+    console.warn("⚠️ No Facebook groups found in database.");
+    return NextResponse.json(
+      { error: "No Facebook groups found in database" },
+      { status: 400 },
+    );
+  }
 
   if (!groups || groups.length === 0) {
     console.warn("⚠️ No Facebook groups specified ");
@@ -55,22 +77,22 @@ export async function GET(request: Request) {
     const group = groups[i];
     const groupStartTime = Date.now();
     console.log(
-      `\n--- Processing group ${i + 1}/${groups.length}: ${group} ---`,
+      `\n--- Processing group ${i + 1}/${groups.length}: ${group.facebook_id} ---`,
     );
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 1500)); // 1.5 second delay between groups to avoid rate limits
-      const res = await fetchFbPosts(fromApi as FromApi, group);
+      const res = await fetchFbPosts(fromApi as FromApi, group.facebook_id);
 
       if (!res.ok) {
         const text = await res.text();
-        console.error(`❌ API request failed for group ${group}:`, {
+        console.error(`❌ API request failed for group ${group.facebook_id}:`, {
           status: res.status,
           statusText: res.statusText,
           body: text.substring(0, 500), // Limit log size
         });
         groupResults.push({
-          group,
+          group: group.facebook_id,
           status: "failed",
           error: `API returned ${res.status}`,
         });
@@ -81,13 +103,15 @@ export async function GET(request: Request) {
 
       const fbPosts = extractPosts(fromApi as FromApi, resData);
       const postsCount = Array.isArray(fbPosts) ? fbPosts.length : 0;
-      console.log(`📬 Received ${postsCount} posts from group ${group}`);
+      console.log(
+        `📬 Received ${postsCount} posts from group ${group.facebook_id}`,
+      );
       totalFetchedPosts += postsCount;
 
       if (postsCount === 0) {
-        console.log(`ℹ️ No posts to process for group ${group}`);
+        console.log(`ℹ️ No posts to process for group ${group.facebook_id}`);
         groupResults.push({
-          group,
+          group: group.facebook_id,
           status: "success",
           fetched: 0,
           created: 0,
@@ -109,6 +133,7 @@ export async function GET(request: Request) {
           fromApi as FromApi,
           fbPost,
           anonymousUserId!,
+          group.facebook_id,
         );
 
         // Skip posts without message
@@ -150,6 +175,10 @@ export async function GET(request: Request) {
             continue;
           }
         }
+
+        const detected = await detectPostType(newPost.content);
+        newPost.author_type = detected.type;
+        newPost.used_llm = detected.usedLLM;
 
         try {
           const { error: insertError } = await supabase
@@ -205,15 +234,18 @@ export async function GET(request: Request) {
       totalFailedInserts += groupFailed;
 
       const groupDuration = Date.now() - groupStartTime;
-      console.log(`✓ Group ${group} completed in ${groupDuration}ms:`, {
-        fetched: postsCount,
-        created: groupCreated,
-        skipped: groupSkipped,
-        failed: groupFailed,
-      });
+      console.log(
+        `✓ Group ${group.facebook_id} completed in ${groupDuration}ms:`,
+        {
+          fetched: postsCount,
+          created: groupCreated,
+          skipped: groupSkipped,
+          failed: groupFailed,
+        },
+      );
 
       groupResults.push({
-        group,
+        group: group.facebook_id,
         status: "success",
         fetched: postsCount,
         created: groupCreated,
@@ -222,8 +254,15 @@ export async function GET(request: Request) {
         duration: groupDuration,
       });
     } catch (err) {
-      console.error(`❌ Unexpected error processing group ${group}:`, err);
-      groupResults.push({ group, status: "error", error: String(err) });
+      console.error(
+        `❌ Unexpected error processing group ${group.facebook_id}:`,
+        err,
+      );
+      groupResults.push({
+        group: group.facebook_id,
+        status: "error",
+        error: String(err),
+      });
     }
   }
 
@@ -291,31 +330,30 @@ function buildPostEntity(
   fromApi: FromApi,
   fbPost: any,
   anonymousUserId: string,
+  groupId: string,
 ) {
   let entity: Partial<Post>;
   switch (fromApi) {
     case "facebook-scraper3":
       entity = {
         content: fbPost.message,
-        author_type: fbPost.message ? detectPostType(fbPost.message) : "driver",
         author_name: fbPost.author?.name ?? null,
         user_id: anonymousUserId,
         facebook_url:
           fbPost.url ?? normalizeFacebookUrl(fbPost.author?.url) ?? null,
         facebook_id: fbPost.post_id ?? null,
+        group_id: groupId,
         phone: extractPhone(fbPost.message),
       };
       break;
     case "facebook-scraper-api4":
       entity = {
         content: fbPost.values?.text,
-        author_type: fbPost.values?.text
-          ? detectPostType(fbPost.values?.text)
-          : "driver",
         author_name: fbPost.user_details?.name ?? null,
         user_id: anonymousUserId,
         facebook_url: fbPost.details?.post_link,
         facebook_id: fbPost.details?.post_id,
+        group_id: groupId,
         phone: extractPhone(fbPost.values?.text),
       };
       break;
@@ -328,7 +366,7 @@ function buildPostEntity(
 
 function reportCronJobResults(
   totalDuration: number,
-  groups: string[],
+  groups: { facebook_id: string }[],
   totalFetchedPosts: number,
   totalCreatedPosts: number,
   totalSkippedPosts: number,

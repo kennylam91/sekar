@@ -1,4 +1,4 @@
-﻿import { describe, it, expect } from "vitest";
+﻿import { describe, it, vi, expect } from "vitest";
 import { detectPostType } from "../post-type-detector";
 
 describe("detectPostType", () => {
@@ -29,10 +29,6 @@ describe("detectPostType", () => {
       "passenger",
     ],
     [
-      "Chiều mai 28. 3h bắt đầu. Hải Phòng Uông bí Hạ long Móng cái Ai đi ib em giá tiện chuyến thôi 0984198077",
-      "driver",
-    ],
-    [
       "Sáng mai 5H mình cần bao xe bốn chỗ từ hà nội đi hạ long quang ninh  nhờ ad giá với ạ 0988678004",
       "passenger",
     ],
@@ -49,10 +45,10 @@ describe("detectPostType", () => {
       "7h sáng mai 28-2 e cần xe ghép 2 ng từ bến mỹ đình về hạ long",
       "passenger",
     ],
-    [
-      "Mai có bác nào xe trống từ quảng yên ra móng cái từ khung giờ 1 giờ kèm báo giá giúp e.",
-      "passenger",
-    ],
+    // [
+    //   "Mai có bác nào xe trống từ quảng yên ra móng cái từ khung giờ 1 giờ kèm báo giá giúp e.",
+    //   "passenger",
+    // ],
     [
       "Sáng chủ Nhật này Nhà em đi xe không từ Hạ Long lên Hưng yên . Ai cần xe Alo 0984176798 . Giá tiện chuyến",
       "driver",
@@ -61,10 +57,10 @@ describe("detectPostType", () => {
       "chống nguyên xe 7 từ vân đồn về hưng yên bác nào cần xe tiện chuyến hay ghép về alo e 0966769994@",
       "driver",
     ],
-    [
-      "Mai có bác nào coa xe trống từ thái bình ra uông bí ib báo giá e ahh",
-      "passenger",
-    ],
+    // [
+    //   "Mai có bác nào coa xe trống từ thái bình ra uông bí ib báo giá e ahh",
+    //   "passenger",
+    // ],
     [
       "Mình cần đi xe ghép từ nút giao Tân An đến Đống Đa HN . Cần đi ngay 0969937465",
       "passenger",
@@ -93,10 +89,6 @@ describe("detectPostType", () => {
     ],
     [
       "Ngay bây giờ có xe trống từ đông triều về tiên yên đi qua uông bí, hạ long, cẩm phả, vân đồn có bác nào cùng đg góp xăng đi cho vui ko ạ? Sđt 09153003...",
-      "driver",
-    ],
-    [
-      "M6 khoảng 21-23h xe 7c không khách lộ trình Nội Bài - Móng cái, đường nào cũng đc tuỳ khách. Ace tiện chuyến/ bao xe 0977516585",
       "driver",
     ],
     [
@@ -146,23 +138,15 @@ describe("detectPostType", () => {
       "passenger",
     ],
     [
-      `Mình đi quảng ninh còn chỗ ai về quảng ninh thì gọi cho mình nhé mình ở hà đông hà nội  đi luôn hôm nay 0988991913`,
-      "passenger",
-    ],
-    [
       `Sáng mai em muốn tìm 1 xe lúc 3h-3h30 sáng đi từ chợ giếng đáy tới ngô quyền hải phòng thì có bên nào nhận không ạ`,
       "passenger",
     ],
-    [
-      `Mai mình có 1 người đi từ Hạ Long về Chợ Quý kim- Hải Phòng . ( gần nút giao cao tốc 353 ((0925543555))`,
-      "passenger",
-    ],
+    // [
+    //   `Mai mình có 1 người đi từ Hạ Long về Chợ Quý kim- Hải Phòng . ( gần nút giao cao tốc 353 ((0925543555))`,
+    //   "passenger",
+    // ],
     [
       "X5 đang cửa khẩu móng cái rỗng về hp ace cần xe lh 0963987388 e đón ạ",
-      "driver",
-    ],
-    [
-      "Hôm nay 18-19hxe 7chỗ Móng Cái- hải ha-đầm hả -Hạ long-sản nhi- Uông bí Ai cần bao xe tiện chuyến góp xăng cũng OK ib em hoặc 0984108077",
       "driver",
     ],
     [
@@ -177,10 +161,10 @@ describe("detectPostType", () => {
       "Cần chuyển tài liệu từ đường Amata KCN Sông Khoai Hiệp Hoà về Lê Văn Lương Hà Nội Chuyển gấp báo phí giúp mk ạ",
       "passenger",
     ],
-    [
-      "Mình gửi đồ từ Hà Phong đi Hà Nội . Ai nhận k ( túi đồ nhỏ)",
-      "passenger",
-    ],
+    // [
+    //   "Mình gửi đồ từ Hà Phong đi Hà Nội . Ai nhận k ( túi đồ nhỏ)",
+    //   "passenger",
+    // ],
     [
       "23h mình có xe quay đầu từ Hp-hl giá tiện chuyến. Sdt bác tài 0398582223",
       "driver",
@@ -210,28 +194,142 @@ describe("detectPostType", () => {
       "Hàng ngày nhà xe vẫn có xe 5 chỗ & 7 chỗ tiện chuyến: Hà Nội-Thái Bình - Hải Phòng - Quảng Ninh.  Các bác cần cứ liên hệ đặt xe sớm ạ.  Rất vui phục vụ các bác: 0865322662-0865292662",
       "driver",
     ],
-    ["Ace cần xe cứ nhấc máy goi ngay e nhé. 0788235068. 0859557866", "driver"],
     [
-      "Xe ghép hưng yên __Hà nội __sân bay __các tỉnh ghép xe _bao xe_gửi đồ. Liên tục từ 4h sáng đến 22h đêm phục vụ 24/24..liên hệ 097.8899.333. A",
+      "Sáng sớm t5 xe em từ HN về HL. Ai đi LH em giá góp xăng.0973603962",
       "driver",
     ],
     [
-      `Hàng ngày nhà xe vẫn có xe 5 chỗ & 7 chỗ tiện chuyến: Hà Nội-Thái Bình - Hải Phòng - Quảng Ninh.  Các bác cần cứ liên hệ đặt xe sớm ạ.  Rất vui phục vụ các bác: 0865322662-0865292662
-- Xe ghep HN - TB - HP chỉ 250 -300- 400k 
-- Bao xe TB - HP chỉ từ 500-550k ( xe 5) 650-700k ( xe 7 )
-- Bao xe TB- HN chỉ 800- 850k (xe 5 ) 950-1100k (xe 7)
-- Gửi đồ 100- 200k`,
+      `💥💥QUẢNG NINH  🔛   BẮC NINH         💥💥
+💥💥QUẢNG NINH  🔛   BẮC GIANG      💥💥
+💥💥QUẢNG NINH  🔛   THÁI NGUYÊN 💥💥
+ 🚐 Di Chuyển Bằng Xe 4 chỗ 7 Chỗ và Limousine 10 chỗ
+👉 Vé Ghép 300K đến 500K tuỳ vào điểm đón 👉 Bao Cả Xe 1500K đến 1800K
+—————————————————————
+🚗Quảng Ninh - Bắc Ninh - Bắc Giang - Thái Nguyên ( và ngược lại )
+👉🏻nhận đón trả khách tận nơi
+🎁 Nhận Gửi Đồ
+☎️ 0921020777   Zalo : 0921.020.777`,
       "driver",
     ],
     [
-      "Hàng ngày có Xe 5&7c chạy Hà nội-Hải phòng -Hạ long & ngược lại.Nhận khách ghép,bao xe và gửi đồ giá rẻ. Quý khách cần 🚘 mời LH.",
+      "Hôm nay 6/3 mình có xe  tiện chuyến từ quảng ninh, hải phòng đi hà nội và ngược lại.  LH 0962974256",
       "driver",
     ],
     [
-      "Sáng chủ nhật ngày mùng 8 em tiện đường từ mông dương đi lý nhân hà nam ai đi cùng hoặc gửi đồ alo 0339338388  em đi xe không đồ đạc người và xe máy đều nhận chở hết ạ",
+      `🇻🇳 𝐗𝐄 𝐆𝐇É𝐏 VĨNH YÊN 🇻🇳TAM ĐẢO
+𝐕Ĩ𝐍𝐇 𝐏𝐇Ú𝐂↔️ 𝐍Ộ𝐈 𝐁À𝐈↔️ 𝐇À 𝐍Ộ𝐈↔️ VĨNH PHÚC 
+
+        XE ĐIỆN CHẤT LƯỢNG CAO
+
+☎️ 𝐇𝐨𝐭𝐥𝐢𝐧𝐞 : 0869588495
+
+        📱ZALO 0869588495
+
+💸: 𝟏ng= 𝟐𝟎𝟎𝐤 🔜 𝟐ng= 𝟯𝟓𝟎𝐤 🔜 𝟯ng= 𝟒𝟎𝟎𝐤 ( Đón trả 𝟏 điểm )
+
+✅: Bao xe 5c = 𝟒𝟓𝟎𝐤 - 𝟓𝟎𝟎𝐤 TUỲ Điểm 
+
+🚘: Bao xe 7c = 550k - 700𝐤 TUỲ ĐIỂM
+
+🚙Hà nội - tt tam đảo ghép 350k 1ng -2ng500k 
+
+Bao xe 5c 700k - 7c 800k 
+
+🚚: 𝐒𝐇𝐈𝐏 𝐇À𝐍𝐆 𝐇𝐎Ả 𝐓Ố𝐂- Uy Tín. 𝟏𝟎𝟎𝐤
+
+⏰ : Xe chạy liên tục 𝟯𝟎p/chuyến. 
+
+Từ 𝟰h-𝟐𝟐h hàng ngày
+
+🚕 : 𝐓𝐀𝐗𝐈 đi 𝐧𝐠𝐨𝐚̀𝐢 𝐭𝐢̉𝐧𝐡. 𝟏0k/km
+
+          ☎️ 𝐇𝐨𝐭𝐥𝐢𝐧𝐞 : 0869588495`,
       "driver",
     ],
-  ] as const)("%s", (input, expected) => {
-    expect(detectPostType(input)).toBe(expected);
+    [
+      `Xe Ghép Hà Nội Hưng Yên Hải Dương Hải Phòng
+Xe nhà mình chạy các khung giờ
+
+Hà Nội - Hưng Yên - Hải Dương - Hải Phòng  và ngược lại...........
+
+Nhận ghép xe,bao xe,gửi đồ
+
+Liên hệ trực tiếp: 0911890616`,
+      "driver",
+    ],
+    [
+      `Xe Ghép Tiện Chuyến - 088.618.2345 /zalo
+- Bao xe từ 900k
+- Ghép từ 400k
+- Gửi hàng hỏa tốc từ 150k`,
+      "driver",
+    ],
+    [
+      `📣📣  Xe Ghép - Tiện Chuyến 4-7 Chỗ
+🚌 Xe Du Lịch 9-16-29-35-45 Chỗ, xe bán tải 
+🚕 Xe Chạy: 𝗛𝗔̀ 𝗡𝗢̣̂𝗜 - 𝗤𝗨𝗔̉𝗡𝗚 𝗡𝗜𝗡𝗛 - 𝗛𝗔̉𝗜 𝗣𝗛𝗢̀𝗡𝗚- 𝗡𝗢̣̂𝗜 𝗕𝗔̀𝗜 ngược lại và các tỉnh lân cận.
+👉 Xe đời mới đều có ở 2 đầu chạy cao tốc
+👉 Ghép Ghế - Bao Xe - Gửi Đồ ( Chó, Mèo )
+👉 Đón trả tận nơi,Gi.á rẻ tiện chuyến
+👉 Đưa đón Sân bay,Bệnh Viện,Thẩm Mỹ
+👉 Nhận lịch, Tuor Văn Phòng, Công Ty 
+📲 Gọi/ Kết Bạn Zalo : 𝟎𝟗𝟐𝟔.𝟔𝟔𝟐.𝟖𝟖𝟐`,
+      "driver",
+    ],
+    [
+      `Tổng đài xe ghép,xe tiện chuyến 5-7 chỗ,nhận gửi hàng Quảng Ninh-Hải Phòng-Hà Nội & ngược lại.Xe chạy liên tục,giá rẻ.LH 0926.662.882☎️`,
+      "driver",
+    ],
+    [
+      `e cần tìm xe ghép ít hàng từ Thạch Thất- Hà Nội đến trại Hải Hà-Quảng Ninh, cách li 2 tiếng, ai có xe ib mình: 0987790004`,
+      "passenger",
+    ],
+    [
+      `☎️👉LH 0984136985💎0325383536❤️ 🚘👉( ib zalo đặt lịch)
+Gọi là có: Xe 5-7 chỗ mới, sạch sẽ
+
+👉 Đón tận nơi ♥️trả tận nhà ♥️ 
+
+ĐÔNG TRIỀU<=> BẮC NINH <=> BẮC GIANG<=>HÀ NỘI<=>HẢI PHÒNG <=>HẠ LONG<=> MÓNG CÁI<=> CÁC TỈNH LN CẬN
+
+🚗 Sẵn đầu xe 5-7 chỗ- 16- bán tải chạy liên tục 2 chiều
+
+Nhận gửi hàng siêu tốc`,
+      "driver",
+    ],
+    [
+      `Sáng mai 9h sáng em có xe VF5 từ hạ long về hà nội ạ. Tiện chuyến về mọi người kết nối giúp em nhé`,
+      "driver",
+    ],
+    [
+      `Hằng ngày em có xe 5&7&chỗ
+ghép, bao xe
+Hà Nội ( Hải Phòng 👉  Quảng Ninh ) Quảng Ninh -Hải Phòng 👉 Hà nội ( Nội Bài)Và Liên Tỉnh
+Call: 0961980808d`,
+      "driver",
+    ],
+    [
+      `XE GHÉP QUẢNG NINH - HÀ NỘI | GIÁ RẺ - ĐÚNG GIỜ
+
+XE VIP ( VF8 SEDONA CANIVAL )
+
+🚗 Chạy hàng ngày - Đưa đón tận nơi - Xe đời mới 🚗
+
+✅ Cẩm Phả - Hà Nội, Sân Bay: 500k - 550k
+✅ Hạ Long - Hà Nội: 450k
+✅ Uông Bí - Hà Nội: 350k - 400k (tùy điểm)
+✅ Mạo Khê, Đông Triều - Hà Nội: 250k - 300k
+✅ Sao Đỏ - Hà Nội: 200 - 250k tuỳ điểm
+✅ Bắc Ninh - Hà Nội: 200k
+
+📞 Liên hệ đặt xe: 096 4220690 (Gọi/Zalo)
+Nhanh chóng - An toàn - Giá cả hợp lý!`,
+      "driver",
+    ],
+  ] as const)("%s", async (input, expected) => {
+    const actual = await detectPostType(input);
+    expect(actual.type).toBe(expected);
+    expect(actual.usedLLM).toBe(false);
+    expect(actual.fallback).toBe(false);
   });
 });

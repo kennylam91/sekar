@@ -21,6 +21,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!/^[a-zA-Z0-9_.-]+$/.test(username)) {
+      return NextResponse.json(
+        {
+          error:
+            "Tên đăng nhập chỉ được dùng chữ cái, số, dấu gạch dưới, dấu chấm và dấu gạch ngang",
+        },
+        { status: 400 },
+      );
+    }
+
     if (password.length < 6) {
       return NextResponse.json(
         { error: "Mật khẩu phải ít nhất 6 ký tự" },
