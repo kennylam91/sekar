@@ -6,6 +6,7 @@ export interface User {
   username: string;
   display_name: string | null;
   role: UserRole;
+  preferred_routes: string[];
   created_at: string;
   updated_at: string;
 }
@@ -21,6 +22,7 @@ export interface Post {
   zalo_url: string | null;
   is_visible: boolean;
   used_llm: boolean;
+  routes: string[];
   created_at: string;
   updated_at: string;
   facebook_id?: string;
@@ -44,6 +46,7 @@ export interface FacebookGroup {
   posts_in_last_month: number;
   total_members: number;
   note: string | null;
+  routes: string[];
   created_at: string;
   updated_at: string;
 }
