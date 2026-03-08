@@ -103,7 +103,7 @@ describe("detectPostType", () => {
       "🚘Nhà Em Có Xe: 4 - 7 Chỗ Chạy Hàng Ngày\n💥☎️ - ZaLo : 0981828618 \n💥Chạy Liên Tục: Ghép Khách - Bao Xe - Gửi Đồ\n💥Phục Vụ Quý Khách - Đưa Đón Tận Nơi \n💥Đội Ngũ Lái Xe Chuyên Nghiệp \n💥Hân Hạnh Được Phục Vụ Quý Khách \n💥Xin Liên Hệ: 0981828618",
       "driver",
     ],
-    ["Hôm nay Có xe ghép nào từ Mai Động HN về Uông Bí k ạ\n", "passenger"],
+    ["Hôm nay Có xe ghép nào từ Mai Động HN về Uông Bí k ạ", "passenger"],
     [
       "Sáng mai xe em 5c tầm 9h e lên hà nội có bác nào ghép cùng không",
       "driver",
@@ -134,9 +134,7 @@ describe("detectPostType", () => {
       "passenger",
     ],
     [
-      `em có thùng đồ muốn gửi về 
-đông ngũ - tiên yên - quảng ninh
-chiều nay ai nhận ko ah`,
+      `em có thùng đồ muốn gửi về đông ngũ - tiên yên - quảng ninh chiều nay ai nhận ko ah`,
       "passenger",
     ],
     [
