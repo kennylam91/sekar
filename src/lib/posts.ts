@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import type { PostFilter, Post, JWTPayload } from "@/types";
+import { normalizeRoutesArray } from "@/lib/routes";
 
 export const PAGE_SIZE = 10;
 
@@ -52,6 +53,21 @@ export async function fetchPosts({
   // Build query
   let query = supabase.from("posts").select("*", { count: "exact" });
 
+  let preferredRoutes: string[] = [];
+  if (user?.role === "driver") {
+    const { data: driverProfile, error: driverProfileError } = await supabase
+      .from("users")
+      .select("preferred_routes")
+      .eq("id", user.userId)
+      .single();
+
+    if (driverProfileError) {
+      console.error("Failed to load preferred_routes:", driverProfileError);
+    } else {
+      preferredRoutes = normalizeRoutesArray(driverProfile?.preferred_routes ?? []);
+    }
+  }
+
   // Non-admin users only see visible posts
   if (user?.role !== "admin") {
     query = query.eq("is_visible", true);
@@ -59,6 +75,11 @@ export async function fetchPosts({
 
   if (authorType) {
     query = query.eq("author_type", authorType);
+  }
+
+  if (user?.role === "driver" && preferredRoutes.length > 0) {
+    const overlapLiteral = preferredRoutes.join(",");
+    query = query.or(`routes.ov.{${overlapLiteral}},routes.eq.{}`);
   }
 
   const dateFilter = getDateFilter(filter);
@@ -80,6 +101,11 @@ export async function fetchPosts({
 
   if (authorType) {
     dataQuery = dataQuery.eq("author_type", authorType);
+  }
+
+  if (user?.role === "driver" && preferredRoutes.length > 0) {
+    const overlapLiteral = preferredRoutes.join(",");
+    dataQuery = dataQuery.or(`routes.ov.{${overlapLiteral}},routes.eq.{}`);
   }
 
   if (dateFilter) {

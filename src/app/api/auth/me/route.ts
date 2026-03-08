@@ -11,7 +11,7 @@ export async function GET() {
   // Fetch fresh user data from DB
   const { data: user } = await supabase
     .from("users")
-    .select("id, username, display_name, role")
+    .select("id, username, display_name, role, preferred_routes")
     .eq("id", payload.userId)
     .single();
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { getCurrentUser, setAuthCookie } from "@/lib/auth";
+import { normalizeRoutesArray } from "@/lib/routes";
 
 export async function PUT(request: NextRequest) {
   try {
@@ -10,23 +11,38 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: "Bạn cần đăng nhập" }, { status: 401 });
     }
 
-    const { display_name } = await request.json();
+    const { display_name, preferred_routes } = await request.json();
 
-    if (!display_name || display_name.trim().length < 2) {
+    const updates: Record<string, unknown> = {
+      updated_at: new Date().toISOString(),
+    };
+
+    if (typeof display_name === "string") {
+      if (display_name.trim().length < 2) {
+        return NextResponse.json(
+          { error: "Tên hiển thị phải có ít nhất 2 ký tự" },
+          { status: 400 },
+        );
+      }
+      updates.display_name = display_name.trim();
+    }
+
+    if (preferred_routes !== undefined) {
+      updates.preferred_routes = normalizeRoutesArray(preferred_routes);
+    }
+
+    if (Object.keys(updates).length === 1) {
       return NextResponse.json(
-        { error: "Tên hiển thị phải có ít nhất 2 ký tự" },
+        { error: "Không có dữ liệu để cập nhật" },
         { status: 400 },
       );
     }
 
     const { data: updated, error } = await supabase
       .from("users")
-      .update({
-        display_name: display_name.trim(),
-        updated_at: new Date().toISOString(),
-      })
+      .update(updates)
       .eq("id", user.userId)
-      .select("id, username, display_name, role")
+      .select("id, username, display_name, role, preferred_routes")
       .single();
 
     if (error) {

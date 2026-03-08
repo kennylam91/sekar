@@ -8,6 +8,13 @@ import { NOTIFICATIONS_STORAGE_KEY } from "@/components/NotificationInit";
 import { requestNotificationPermission } from "@/lib/firebase-client";
 import type { User, Post } from "@/types";
 
+const routeOptions = (process.env.NEXT_PUBLIC_ROUTE_OPTIONS ?? "")
+  .split("\n")
+  .map((value) => value.split(","))
+  .flat()
+  .map((value) => value.trim().toUpperCase())
+  .filter((value) => value);
+
 export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -18,6 +25,9 @@ export default function ProfilePage() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [notifToggling, setNotifToggling] = useState(false);
+  const [preferredRoutes, setPreferredRoutes] = useState<string[]>([]);
+  const [routesSaving, setRoutesSaving] = useState(false);
+  const [routesMessage, setRoutesMessage] = useState("");
 
   const fetchUser = useCallback(async () => {
     const res = await fetch("/api/auth/me");
@@ -25,6 +35,7 @@ export default function ProfilePage() {
     if (data.user) {
       setUser(data.user);
       setDisplayName(data.user.display_name || "");
+      setPreferredRoutes(data.user.preferred_routes ?? []);
     }
     setLoading(false);
   }, []);
@@ -112,6 +123,38 @@ export default function ProfilePage() {
       setMessage("Lỗi kết nối");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleRoutesChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selected = Array.from(event.target.selectedOptions, (opt) => opt.value);
+    setPreferredRoutes(selected);
+  };
+
+  const handleUpdateRoutes = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setRoutesMessage("");
+    setRoutesSaving(true);
+
+    try {
+      const res = await fetch("/api/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ preferred_routes: preferredRoutes }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setRoutesMessage(data.error || "Có lỗi xảy ra");
+      } else {
+        setUser(data.user);
+        setPreferredRoutes(data.user.preferred_routes ?? []);
+        setRoutesMessage("Đã cập nhật tuyến quan tâm!");
+      }
+    } catch {
+      setRoutesMessage("Lỗi kết nối");
+    } finally {
+      setRoutesSaving(false);
     }
   };
 
@@ -240,6 +283,54 @@ export default function ProfilePage() {
               />
             </button>
           </div>
+        </div>
+      )}
+
+      {user.role === "driver" && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 sm:p-6 mb-6">
+          <h2 className="text-lg font-bold text-gray-900 mb-4">Tuyến quan tâm</h2>
+          <form onSubmit={handleUpdateRoutes} className="space-y-3">
+            <select
+              multiple
+              value={preferredRoutes}
+              onChange={handleRoutesChange}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none h-32"
+            >
+              {routeOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+            {routeOptions.length === 0 && (
+              <p className="text-xs text-red-500">
+                Chưa cấu hình `NEXT_PUBLIC_ROUTE_OPTIONS`.
+              </p>
+            )}
+            <p className="text-xs text-gray-500">
+              Giữ phím Ctrl/Cmd để chọn nhiều tuyến.
+            </p>
+
+            {routesMessage && (
+              <p
+                className={`text-sm ${
+                  routesMessage.includes("lỗi") || routesMessage.includes("Lỗi")
+                    ? "text-red-600"
+                    : "text-green-600"
+                }`}
+              >
+                {routesMessage}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={routesSaving}
+              className="bg-primary-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-primary-700 disabled:opacity-50 transition-colors"
+            >
+              {routesSaving ? "Đang lưu..." : "Lưu tuyến quan tâm"}
+            </button>
+          </form>
         </div>
       )}
 
