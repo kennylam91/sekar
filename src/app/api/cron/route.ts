@@ -176,17 +176,16 @@ export async function GET(request: Request) {
           }
         }
 
-        // Skip posts that are not relevant to ride-sharing
+        // Detect post type (also identifies irrelevant posts as "other")
         const detected = await detectPostType(newPost.content);
-        if (!detected.isRelevant) {
-          groupSkipped++;
-          console.log(
-            `  ⊘ Post ${j + 1}/${postsCount}: Skipped (not relevant to ride-sharing)`,
-          );
-          continue;
-        }
         newPost.author_type = detected.type;
         newPost.used_llm = detected.usedLLM;
+        if (detected.type === "other") {
+          newPost.is_visible = false;
+          console.log(
+            `  ⊘ Post ${j + 1}/${postsCount}: Marked as not visible (not relevant to ride-sharing)`,
+          );
+        }
 
         try {
           const { error: insertError } = await supabase

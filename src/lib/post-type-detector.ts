@@ -197,26 +197,21 @@ async function classifyViaLLM(
 }
 
 /**
- * Detects whether a post was written by a driver or a passenger,
- * and whether it is relevant to ride-sharing at all.
+ * Detects whether a post was written by a driver, a passenger, or is
+ * unrelated to ride-sharing ("other").
  *
  * Strategy:
  * 1. If one side has a strong weighted pattern match (score ≥ STRONG_THRESHOLD)
- *    and the other does not → return immediately without an LLM call (relevant).
+ *    and the other does not → return immediately without an LLM call.
  * 2. Otherwise (ambiguous or no signal) → call OpenRouter for classification.
- *    The LLM may also return "irrelevant" to filter off-topic posts.
- * 3. On LLM failure → fall back to score comparison (assume relevant).
+ *    The LLM may also return "irrelevant", mapped to type "other".
+ * 3. On LLM failure → fall back to score comparison (ties → "driver").
  */
 export async function detectPostType(
   content: string,
-): Promise<{
-  type: AuthorType;
-  usedLLM: boolean;
-  fallback: boolean;
-  isRelevant: boolean;
-}> {
+): Promise<{ type: AuthorType; usedLLM: boolean; fallback: boolean }> {
   if (!content || typeof content !== "string")
-    return { type: "driver", usedLLM: false, fallback: false, isRelevant: false };
+    return { type: "other", usedLLM: false, fallback: false };
 
   const normalized = content.normalize("NFKC").toLowerCase();
   const driverScore = score(normalized, DRIVER_PATTERNS);
@@ -225,24 +220,23 @@ export async function detectPostType(
   const driverStrong = driverScore >= STRONG_THRESHOLD;
   const passengerStrong = passengerScore >= STRONG_THRESHOLD;
 
-  // Unambiguous strong signal — no LLM call needed, definitely relevant.
+  // Unambiguous strong signal — no LLM call needed.
   if (driverStrong && !passengerStrong)
-    return { type: "driver", usedLLM: false, fallback: false, isRelevant: true };
+    return { type: "driver", usedLLM: false, fallback: false };
   if (passengerStrong && !driverStrong)
-    return { type: "passenger", usedLLM: false, fallback: false, isRelevant: true };
+    return { type: "passenger", usedLLM: false, fallback: false };
 
-  // Ambiguous or no signal — defer to LLM (handles both type and relevance).
+  // Ambiguous or no signal — defer to LLM (handles type and relevance).
   const llmResult = await classifyViaLLM(content);
   if (llmResult === "irrelevant")
-    return { type: "driver", usedLLM: true, fallback: false, isRelevant: false };
+    return { type: "other", usedLLM: true, fallback: false };
   if (llmResult !== null)
-    return { type: llmResult, usedLLM: true, fallback: false, isRelevant: true };
+    return { type: llmResult, usedLLM: true, fallback: false };
 
-  // Final fallback: score comparison (ties → "driver"), assume relevant.
+  // Final fallback: score comparison (ties → "driver").
   return {
     type: passengerScore > driverScore ? "passenger" : "driver",
     usedLLM: false,
     fallback: true,
-    isRelevant: true,
   };
 }
