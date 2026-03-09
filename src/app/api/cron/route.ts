@@ -1,6 +1,6 @@
 import { normalizeFacebookUrl } from "@/lib/url-utils";
 import { NextResponse } from "next/server";
-import { detectPostType, isPostRelevantToRideSharing } from "@/lib/post-type-detector";
+import { detectPostType } from "@/lib/post-type-detector";
 import { Post } from "@/types";
 import { supabase } from "@/lib/supabase";
 import { notifyDriversOfNewPost } from "@/lib/notifications";
@@ -177,16 +177,14 @@ export async function GET(request: Request) {
         }
 
         // Skip posts that are not relevant to ride-sharing
-        const isRelevant = await isPostRelevantToRideSharing(newPost.content);
-        if (!isRelevant) {
+        const detected = await detectPostType(newPost.content);
+        if (!detected.isRelevant) {
           groupSkipped++;
           console.log(
             `  ⊘ Post ${j + 1}/${postsCount}: Skipped (not relevant to ride-sharing)`,
           );
           continue;
         }
-
-        const detected = await detectPostType(newPost.content);
         newPost.author_type = detected.type;
         newPost.used_llm = detected.usedLLM;
 

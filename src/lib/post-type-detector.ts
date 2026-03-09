@@ -117,10 +117,12 @@ function score(content: string, patterns: WeightedPattern[]): number {
 }
 
 /**
- * Calls the OpenRouter chat-completion API and returns "driver" | "passenger".
+ * Calls the OpenRouter chat-completion API and returns "driver" | "passenger" | "irrelevant".
  * Returns `null` on any error so the caller can fall back gracefully.
  */
-async function classifyViaLLM(content: string): Promise<AuthorType | null> {
+async function classifyViaLLM(
+  content: string,
+): Promise<AuthorType | "irrelevant" | null> {
   const apiKey = process.env.NEXT_OPENROUTER_API_KEY;
   if (!apiKey) {
     console.warn(
@@ -133,10 +135,11 @@ async function classifyViaLLM(content: string): Promise<AuthorType | null> {
   const model = process.env.NEXT_OPENROUTER_MODEL ?? DEFAULT_OPENROUTER_MODEL;
 
   const systemPrompt = `Bạn là hệ thống phân loại bài đăng trên bảng tin xe ghép Việt Nam.
-  Nhiệm vụ: Xác định bài đăng dưới đây do TÀI XẾ hay HÀNH KHÁCH đăng.
-  - TÀI XẾ: người lái xe, chào mời/tìm khách, thông báo xe trống, nhận đặt xe.
-  - HÀNH KHÁCH: người cần đi xe, đặt xe, tìm chỗ ghép, hỏi giá.
-  Chỉ trả lời đúng một từ: "driver" hoặc "passenger". Không giải thích.`;
+  Nhiệm vụ: Xác định bài đăng dưới đây thuộc loại nào.
+  - TÀI XẾ (driver): người lái xe, chào mời/tìm khách, thông báo xe trống, nhận đặt xe.
+  - HÀNH KHÁCH (passenger): người cần đi xe, đặt xe, tìm chỗ ghép, hỏi giá.
+  - KHÔNG LIÊN QUAN (irrelevant): quảng cáo, mua bán xe, tin tức, nội dung không liên quan đến dịch vụ vận chuyển hành khách.
+  Chỉ trả lời đúng một từ: "driver", "passenger" hoặc "irrelevant". Không giải thích.`;
 
   try {
     const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -178,6 +181,10 @@ async function classifyViaLLM(content: string): Promise<AuthorType | null> {
       console.debug("[classifyViaLLM] Classified as driver");
       return "driver";
     }
+    if (answer.startsWith("irrelevant")) {
+      console.debug("[classifyViaLLM] Classified as irrelevant");
+      return "irrelevant";
+    }
     console.warn(`[classifyViaLLM] Unexpected response format: "${answer}"`);
     return null;
   } catch (err) {
@@ -190,124 +197,26 @@ async function classifyViaLLM(content: string): Promise<AuthorType | null> {
 }
 
 /**
- * Calls the OpenRouter chat-completion API to determine if a post is relevant
- * to ride-sharing / carpooling. Returns `true` if relevant, `false` if not,
- * `null` on any error so the caller can fall back gracefully.
- */
-async function checkRelevanceViaLLM(content: string): Promise<boolean | null> {
-  const apiKey = process.env.NEXT_OPENROUTER_API_KEY;
-  if (!apiKey) {
-    console.warn(
-      "[checkRelevanceViaLLM] NEXT_OPENROUTER_API_KEY not set, skipping relevance check",
-    );
-    return null;
-  }
-
-  const model = process.env.NEXT_OPENROUTER_MODEL ?? DEFAULT_OPENROUTER_MODEL;
-
-  const systemPrompt = `Bạn là hệ thống lọc bài đăng trên bảng tin xe ghép Việt Nam.
-  Nhiệm vụ: Xác định bài đăng dưới đây có liên quan đến việc đi xe, xe ghép, đặt xe, tìm xe, chở khách hay không.
-  - LIÊN QUAN: bài về tìm xe, đặt xe, xe ghép, xe tiện chuyến, tài xế tìm khách, hành khách tìm xe, gửi hàng bằng xe.
-  - KHÔNG LIÊN QUAN: quảng cáo, mua bán xe, tin tức, nội dung khác không liên quan đến dịch vụ vận chuyển hành khách.
-  Chỉ trả lời đúng một từ: "relevant" hoặc "irrelevant". Không giải thích.`;
-
-  try {
-    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-        "X-Title": "Sekar Post Relevance Checker",
-      },
-      body: JSON.stringify({
-        model,
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content },
-        ],
-      }),
-      signal: AbortSignal.timeout(8000),
-    });
-
-    if (!res.ok) {
-      console.error(
-        `[checkRelevanceViaLLM] OpenRouter API error: ${res.status} ${res.statusText}`,
-      );
-      return null;
-    }
-
-    const json = await res.json();
-    const answer = (json?.choices?.[0]?.message?.content ?? "")
-      .trim()
-      .toLowerCase();
-
-    console.debug(`[checkRelevanceViaLLM] LLM response: "${answer}"`);
-
-    if (answer.startsWith("irrelevant")) {
-      console.debug("[checkRelevanceViaLLM] Post is NOT relevant to ride-sharing");
-      return false;
-    }
-    if (answer.startsWith("relevant")) {
-      console.debug("[checkRelevanceViaLLM] Post is relevant to ride-sharing");
-      return true;
-    }
-    console.warn(
-      `[checkRelevanceViaLLM] Unexpected response format: "${answer}"`,
-    );
-    return null;
-  } catch (err) {
-    console.error(
-      "[checkRelevanceViaLLM] Error during relevance check:",
-      err instanceof Error ? err.message : String(err),
-    );
-    return null;
-  }
-}
-
-/**
- * Determines whether a post is relevant to ride-sharing / carpooling.
- *
- * Strategy:
- * 1. If the post has a strong driver or passenger pattern signal → relevant
- *    (no LLM call needed).
- * 2. Otherwise → call OpenRouter to verify relevance.
- * 3. On LLM failure → assume relevant to avoid false negatives.
- */
-export async function isPostRelevantToRideSharing(
-  content: string,
-): Promise<boolean> {
-  if (!content || typeof content !== "string") return false;
-
-  const normalized = content.normalize("NFKC").toLowerCase();
-  const driverScore = score(normalized, DRIVER_PATTERNS);
-  const passengerScore = score(normalized, PASSENGER_PATTERNS);
-
-  // Strong signal from either side → definitely relevant, skip LLM call.
-  if (driverScore >= STRONG_THRESHOLD || passengerScore >= STRONG_THRESHOLD) {
-    return true;
-  }
-
-  // No strong signal — defer to LLM.
-  const llmResult = await checkRelevanceViaLLM(content);
-
-  // On LLM failure, assume relevant to avoid accidentally dropping valid posts.
-  return llmResult ?? true;
-}
-
-/**
- * Detects whether a post was written by a driver or a passenger.
+ * Detects whether a post was written by a driver or a passenger,
+ * and whether it is relevant to ride-sharing at all.
  *
  * Strategy:
  * 1. If one side has a strong weighted pattern match (score ≥ STRONG_THRESHOLD)
- *    and the other does not → return immediately without an LLM call.
- * 2. Otherwise (ambiguous or conflicting signals) → call OpenRouter for
- *    classification, falling back to the score comparison on failure.
+ *    and the other does not → return immediately without an LLM call (relevant).
+ * 2. Otherwise (ambiguous or no signal) → call OpenRouter for classification.
+ *    The LLM may also return "irrelevant" to filter off-topic posts.
+ * 3. On LLM failure → fall back to score comparison (assume relevant).
  */
 export async function detectPostType(
   content: string,
-): Promise<{ type: AuthorType; usedLLM: boolean; fallback: boolean }> {
+): Promise<{
+  type: AuthorType;
+  usedLLM: boolean;
+  fallback: boolean;
+  isRelevant: boolean;
+}> {
   if (!content || typeof content !== "string")
-    return { type: "driver", usedLLM: false, fallback: false };
+    return { type: "driver", usedLLM: false, fallback: false, isRelevant: false };
 
   const normalized = content.normalize("NFKC").toLowerCase();
   const driverScore = score(normalized, DRIVER_PATTERNS);
@@ -316,21 +225,24 @@ export async function detectPostType(
   const driverStrong = driverScore >= STRONG_THRESHOLD;
   const passengerStrong = passengerScore >= STRONG_THRESHOLD;
 
-  // Unambiguous strong signal — no LLM call needed.
+  // Unambiguous strong signal — no LLM call needed, definitely relevant.
   if (driverStrong && !passengerStrong)
-    return { type: "driver", usedLLM: false, fallback: false };
+    return { type: "driver", usedLLM: false, fallback: false, isRelevant: true };
   if (passengerStrong && !driverStrong)
-    return { type: "passenger", usedLLM: false, fallback: false };
+    return { type: "passenger", usedLLM: false, fallback: false, isRelevant: true };
 
-  // Ambiguous or no signal — defer to LLM.
+  // Ambiguous or no signal — defer to LLM (handles both type and relevance).
   const llmResult = await classifyViaLLM(content);
+  if (llmResult === "irrelevant")
+    return { type: "driver", usedLLM: true, fallback: false, isRelevant: false };
   if (llmResult !== null)
-    return { type: llmResult, usedLLM: true, fallback: false };
+    return { type: llmResult, usedLLM: true, fallback: false, isRelevant: true };
 
-  // Final fallback: score comparison (ties → "driver").
+  // Final fallback: score comparison (ties → "driver"), assume relevant.
   return {
     type: passengerScore > driverScore ? "passenger" : "driver",
     usedLLM: false,
     fallback: true,
+    isRelevant: true,
   };
 }
