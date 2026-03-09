@@ -12,10 +12,11 @@ const DRIVER_PATTERNS: WeightedPattern[] = [
   { pattern: /hotline/, weight: 3 },
   { pattern: /tìm\s+khách/, weight: 3 },
   { pattern: /có\s+xe\s+trống/, weight: 3 },
+  { pattern: /có\s+xe\s+(\d)c\s+trống/, weight: 3 },
   { pattern: /có\s+xe\s+ghép\s+từ/, weight: 3 }, // "có xe ghép từ X" — driver advertising a ride
   { pattern: /bác\s+nào\s+cần\s+xe/, weight: 3 }, // "bác nào cần xe" — driver seeking passengers
   { pattern: /(ai|ace)\s+cần\s+xe/, weight: 3 }, // "ai cần xe" — driver seeking passengers
-  { pattern: /(?:mình|em)\s+có\s+xe\s+\d+\s+chỗ/, weight: 3 }, // "mình/em có xe 7 chỗ"
+  { pattern: /(mình|em)\s+có\s+xe/, weight: 3 }, // "mình/em có xe 7 chỗ"
   { pattern: /có\s+xe\s+quay\s+đầu/, weight: 3 }, // "có xe quay đầu" — returning empty vehicle
   { pattern: /nhận\s+bao\s+xe/, weight: 3 }, // "nhận bao xe" — driver accepting charter bookings
   { pattern: /mọi\s+người\s+cần\s+xe/, weight: 3 }, // "mọi người cần xe" — driver addressing potential passengers
@@ -49,6 +50,15 @@ const DRIVER_PATTERNS: WeightedPattern[] = [
   { pattern: /ghép\s+cho/, weight: 3 }, // "ghép cho" — driver offering to add passengers
   { pattern: /hằng\s+ngày/, weight: 3 }, // "ib em" — driver asking passengers to message them
   { pattern: /khách\s+bao\s+xe/, weight: 3 }, // "khách bao xe" — passengers can charter, ie driver listing service
+  { pattern: /(e|em)\s+có\s+xe/, weight: 3 },
+  { pattern: /nhận\s+chở\s+hàng/, weight: 3 },
+  { pattern: /nhận\s+hàng\s+tận\s+nhà/, weight: 3 },
+  { pattern: /đón\s+trả\s+tận\s+nơi/, weight: 3 },
+  {pattern: /có\s+xe\s+\d+\s+chỗ\s+trống/, weight: 3},
+  {pattern: /ngày\s+trong\s+tuần/, weight: 3},
+  {pattern: /đi\s+xe\s+rỗng/, weight: 3},
+  {pattern: /tiện\s+chuyến\s+giá\s+rẻ/, weight: 3},
+
 ];
 
 /**
@@ -73,7 +83,7 @@ const PASSENGER_PATTERNS: WeightedPattern[] = [
   { pattern: /báo\s+giá\s+bao\s+xe/, weight: 3 }, // "báo giá bao xe"
   { pattern: /muốn\s+tìm\s+\d*\s*xe/, weight: 3 }, // "muốn tìm 1 xe"
   { pattern: /cần\s+\d+\s+xe/, weight: 3 }, // "cần 1 xe"
-  { pattern: /có\s+xe\s+nào/, weight: 3 }, // "có xe nào"
+  { pattern: /có\s+(xe|chuyến)\s+nào/, weight: 3 }, // "có xe nào"
   { pattern: /còn\s+xe\s+nào/, weight: 3 }, // "còn xe nào"
   { pattern: /mình\s+cần\s+đi/, weight: 3 }, // "mình cần đi"
   { pattern: /muốn\s+hỏi\s+xe/, weight: 3 }, // "muốn hỏi xe"
@@ -85,8 +95,11 @@ const PASSENGER_PATTERNS: WeightedPattern[] = [
   { pattern: /báo\s+phí/, weight: 3 }, // "báo phí giúp" — asking for a price quote = passenger
   { pattern: /(?<!\w)e\s+tìm\s+xe/, weight: 3 }, // word-boundary: avoid matching "ace tìm xe"
   { pattern: /(?<!\w)e\s+cần\s+xe/, weight: 3 }, // word-boundary: avoid matching "ace cần xe"
+  { pattern: /em\s+cần\s+xe/, weight: 3 }, 
   { pattern: /cần\s+tìm\s+xe/, weight: 3 }, // "cần tìm xe" — passenger looking for a ride
   { pattern: /có\s+\d+người/, weight: 3 },
+  { pattern: /ai\s+có\s+xe/, weight: 3 },
+  { pattern: /^tìm\s+xe/, weight: 3}
 ];
 
 /** Minimum score from a single weight-3 pattern to be considered a "strong" signal. */
@@ -104,10 +117,12 @@ function score(content: string, patterns: WeightedPattern[]): number {
 }
 
 /**
- * Calls the OpenRouter chat-completion API and returns "driver" | "passenger".
+ * Calls the OpenRouter chat-completion API and returns "driver" | "passenger" | "irrelevant".
  * Returns `null` on any error so the caller can fall back gracefully.
  */
-async function classifyViaLLM(content: string): Promise<AuthorType | null> {
+async function classifyViaLLM(
+  content: string,
+): Promise<AuthorType | "irrelevant" | null> {
   const apiKey = process.env.NEXT_OPENROUTER_API_KEY;
   if (!apiKey) {
     console.warn(
@@ -120,10 +135,11 @@ async function classifyViaLLM(content: string): Promise<AuthorType | null> {
   const model = process.env.NEXT_OPENROUTER_MODEL ?? DEFAULT_OPENROUTER_MODEL;
 
   const systemPrompt = `Bạn là hệ thống phân loại bài đăng trên bảng tin xe ghép Việt Nam.
-  Nhiệm vụ: Xác định bài đăng dưới đây do TÀI XẾ hay HÀNH KHÁCH đăng.
-  - TÀI XẾ: người lái xe, chào mời/tìm khách, thông báo xe trống, nhận đặt xe.
-  - HÀNH KHÁCH: người cần đi xe, đặt xe, tìm chỗ ghép, hỏi giá.
-  Chỉ trả lời đúng một từ: "driver" hoặc "passenger". Không giải thích.`;
+  Nhiệm vụ: Xác định bài đăng dưới đây thuộc loại nào.
+  - TÀI XẾ (driver): người lái xe, chào mời/tìm khách, thông báo xe trống, nhận đặt xe.
+  - HÀNH KHÁCH (passenger): người cần đi xe, đặt xe, tìm chỗ ghép, hỏi giá.
+  - KHÔNG LIÊN QUAN (irrelevant): quảng cáo, mua bán xe, tin tức, nội dung không liên quan đến dịch vụ vận chuyển hành khách.
+  Chỉ trả lời đúng một từ: "driver", "passenger" hoặc "irrelevant". Không giải thích.`;
 
   try {
     const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -165,6 +181,10 @@ async function classifyViaLLM(content: string): Promise<AuthorType | null> {
       console.debug("[classifyViaLLM] Classified as driver");
       return "driver";
     }
+    if (answer.startsWith("irrelevant")) {
+      console.debug("[classifyViaLLM] Classified as irrelevant");
+      return "irrelevant";
+    }
     console.warn(`[classifyViaLLM] Unexpected response format: "${answer}"`);
     return null;
   } catch (err) {
@@ -177,19 +197,21 @@ async function classifyViaLLM(content: string): Promise<AuthorType | null> {
 }
 
 /**
- * Detects whether a post was written by a driver or a passenger.
+ * Detects whether a post was written by a driver, a passenger, or is
+ * unrelated to ride-sharing ("other").
  *
  * Strategy:
  * 1. If one side has a strong weighted pattern match (score ≥ STRONG_THRESHOLD)
  *    and the other does not → return immediately without an LLM call.
- * 2. Otherwise (ambiguous or conflicting signals) → call OpenRouter for
- *    classification, falling back to the score comparison on failure.
+ * 2. Otherwise (ambiguous or no signal) → call OpenRouter for classification.
+ *    The LLM may also return "irrelevant", mapped to type "other".
+ * 3. On LLM failure → fall back to score comparison (ties → "driver").
  */
 export async function detectPostType(
   content: string,
 ): Promise<{ type: AuthorType; usedLLM: boolean; fallback: boolean }> {
   if (!content || typeof content !== "string")
-    return { type: "driver", usedLLM: false, fallback: false };
+    return { type: "other", usedLLM: false, fallback: false };
 
   const normalized = content.normalize("NFKC").toLowerCase();
   const driverScore = score(normalized, DRIVER_PATTERNS);
@@ -204,8 +226,10 @@ export async function detectPostType(
   if (passengerStrong && !driverStrong)
     return { type: "passenger", usedLLM: false, fallback: false };
 
-  // Ambiguous or no signal — defer to LLM.
+  // Ambiguous or no signal — defer to LLM (handles type and relevance).
   const llmResult = await classifyViaLLM(content);
+  if (llmResult === "irrelevant")
+    return { type: "other", usedLLM: true, fallback: false };
   if (llmResult !== null)
     return { type: llmResult, usedLLM: true, fallback: false };
 
