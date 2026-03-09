@@ -26,7 +26,9 @@ export default function PostForm({
   );
   const [zaloUrl, setZaloUrl] = useState(editingPost?.zalo_url || "");
   const [authorType, setAuthorType] = useState<"driver" | "passenger">(
-    editingPost?.author_type ?? (isDriver ? "driver" : "passenger"),
+    (editingPost?.author_type === "driver" || editingPost?.author_type === "passenger"
+      ? editingPost.author_type
+      : undefined) ?? (isDriver ? "driver" : "passenger"),
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
