@@ -190,6 +190,111 @@ async function classifyViaLLM(content: string): Promise<AuthorType | null> {
 }
 
 /**
+ * Calls the OpenRouter chat-completion API to determine if a post is relevant
+ * to ride-sharing / carpooling. Returns `true` if relevant, `false` if not,
+ * `null` on any error so the caller can fall back gracefully.
+ */
+async function checkRelevanceViaLLM(content: string): Promise<boolean | null> {
+  const apiKey = process.env.NEXT_OPENROUTER_API_KEY;
+  if (!apiKey) {
+    console.warn(
+      "[checkRelevanceViaLLM] NEXT_OPENROUTER_API_KEY not set, skipping relevance check",
+    );
+    return null;
+  }
+
+  const model = process.env.NEXT_OPENROUTER_MODEL ?? DEFAULT_OPENROUTER_MODEL;
+
+  const systemPrompt = `Bạn là hệ thống lọc bài đăng trên bảng tin xe ghép Việt Nam.
+  Nhiệm vụ: Xác định bài đăng dưới đây có liên quan đến việc đi xe, xe ghép, đặt xe, tìm xe, chở khách hay không.
+  - LIÊN QUAN: bài về tìm xe, đặt xe, xe ghép, xe tiện chuyến, tài xế tìm khách, hành khách tìm xe, gửi hàng bằng xe.
+  - KHÔNG LIÊN QUAN: quảng cáo, mua bán xe, tin tức, nội dung khác không liên quan đến dịch vụ vận chuyển hành khách.
+  Chỉ trả lời đúng một từ: "relevant" hoặc "irrelevant". Không giải thích.`;
+
+  try {
+    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+        "X-Title": "Sekar Post Relevance Checker",
+      },
+      body: JSON.stringify({
+        model,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content },
+        ],
+      }),
+      signal: AbortSignal.timeout(8000),
+    });
+
+    if (!res.ok) {
+      console.error(
+        `[checkRelevanceViaLLM] OpenRouter API error: ${res.status} ${res.statusText}`,
+      );
+      return null;
+    }
+
+    const json = await res.json();
+    const answer = (json?.choices?.[0]?.message?.content ?? "")
+      .trim()
+      .toLowerCase();
+
+    console.debug(`[checkRelevanceViaLLM] LLM response: "${answer}"`);
+
+    if (answer.startsWith("irrelevant")) {
+      console.debug("[checkRelevanceViaLLM] Post is NOT relevant to ride-sharing");
+      return false;
+    }
+    if (answer.startsWith("relevant")) {
+      console.debug("[checkRelevanceViaLLM] Post is relevant to ride-sharing");
+      return true;
+    }
+    console.warn(
+      `[checkRelevanceViaLLM] Unexpected response format: "${answer}"`,
+    );
+    return null;
+  } catch (err) {
+    console.error(
+      "[checkRelevanceViaLLM] Error during relevance check:",
+      err instanceof Error ? err.message : String(err),
+    );
+    return null;
+  }
+}
+
+/**
+ * Determines whether a post is relevant to ride-sharing / carpooling.
+ *
+ * Strategy:
+ * 1. If the post has a strong driver or passenger pattern signal → relevant
+ *    (no LLM call needed).
+ * 2. Otherwise → call OpenRouter to verify relevance.
+ * 3. On LLM failure → assume relevant to avoid false negatives.
+ */
+export async function isPostRelevantToRideSharing(
+  content: string,
+): Promise<boolean> {
+  if (!content || typeof content !== "string") return false;
+
+  const normalized = content.normalize("NFKC").toLowerCase();
+  const driverScore = score(normalized, DRIVER_PATTERNS);
+  const passengerScore = score(normalized, PASSENGER_PATTERNS);
+
+  // Strong signal from either side → definitely relevant, skip LLM call.
+  if (driverScore >= STRONG_THRESHOLD || passengerScore >= STRONG_THRESHOLD) {
+    return true;
+  }
+
+  // No strong signal — defer to LLM.
+  const llmResult = await checkRelevanceViaLLM(content);
+
+  // On LLM failure, assume relevant to avoid accidentally dropping valid posts.
+  return llmResult ?? true;
+}
+
+/**
  * Detects whether a post was written by a driver or a passenger.
  *
  * Strategy:

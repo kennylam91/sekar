@@ -1,6 +1,6 @@
 import { normalizeFacebookUrl } from "@/lib/url-utils";
 import { NextResponse } from "next/server";
-import { detectPostType } from "@/lib/post-type-detector";
+import { detectPostType, isPostRelevantToRideSharing } from "@/lib/post-type-detector";
 import { Post } from "@/types";
 import { supabase } from "@/lib/supabase";
 import { notifyDriversOfNewPost } from "@/lib/notifications";
@@ -174,6 +174,16 @@ export async function GET(request: Request) {
             );
             continue;
           }
+        }
+
+        // Skip posts that are not relevant to ride-sharing
+        const isRelevant = await isPostRelevantToRideSharing(newPost.content);
+        if (!isRelevant) {
+          groupSkipped++;
+          console.log(
+            `  ⊘ Post ${j + 1}/${postsCount}: Skipped (not relevant to ride-sharing)`,
+          );
+          continue;
         }
 
         const detected = await detectPostType(newPost.content);
