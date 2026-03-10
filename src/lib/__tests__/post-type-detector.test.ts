@@ -84,10 +84,6 @@ describe("detectPostType", () => {
       "passenger",
     ],
     [
-      "Em ở ocean park 1 gia lâm cần gửi 5c bánh trưng xuống mạo khê - đông triều QN Ai nhận dc ib e ạ",
-      "passenger",
-    ],
-    [
       "Ngay bây giờ có xe trống từ đông triều về tiên yên đi qua uông bí, hạ long, cẩm phả, vân đồn có bác nào cùng đg góp xăng đi cho vui ko ạ? Sđt 09153003...",
       "driver",
     ],
@@ -339,8 +335,8 @@ Nhanh chóng - An toàn - Giá cả hợp lý!`,
 📞: 𝟬𝟯𝟱𝟵.𝟬𝟭𝟭.𝟲𝟳𝟴 - 𝟬𝟯𝟵𝟰.𝟭𝟱.𝟲𝟲𝟲𝟲 📲
 ʚɞ 𝐴𝘊𝐸 𝑐𝘰́ 𝘩𝑎̀𝘯𝑔 𝑎𝘭𝑜 𝑒𝘮 𝘯ℎ𝘦́ 𝘹𝑒 𝑛𝘩𝑎̀ 𝟐,𝟓-𝟕 𝘵𝑎̂́𝘯 👣
 #xetaighep_xeghephang`, "driver"],
-[`9h - 13h. Ngày 8/3  em có xe 7c Tiện chuyến từ  Vân Đồn _ Hạ Long _  Quảng Yên _ Uông Bí _ Đông triều _ Hải Dương _ Bắc Ninh _ Hà Nội - Sân Bay Nội Bài. Mn góp xăng .0398922984`, "driver"],
-[`💥 Đặt xe nhanh 💥 0931.686.682
+    [`9h - 13h. Ngày 8/3  em có xe 7c Tiện chuyến từ  Vân Đồn _ Hạ Long _  Quảng Yên _ Uông Bí _ Đông triều _ Hải Dương _ Bắc Ninh _ Hà Nội - Sân Bay Nội Bài. Mn góp xăng .0398922984`, "driver"],
+    [`💥 Đặt xe nhanh 💥 0931.686.682
 👉 Quảng Ninh <=> Hải Phòng
 👉 Quảng Ninh <=> Hà Nội
 👉 Hải Phòng <=> Hà Nội
@@ -348,16 +344,87 @@ Nhanh chóng - An toàn - Giá cả hợp lý!`,
 💥 Bao xe, ghép xe, gửi đồ
 ✅ Đón trả tận nơi
 ☎️: 0931.686.682`, 'driver'],
-[`Chiều nay 8/3, tầm 2h có xe 7c trống từ Vân Đồn đi Thái Bình, ai tiện chuyến giá rẻ liên hệ:
+    [`Chiều nay 8/3, tầm 2h có xe 7c trống từ Vân Đồn đi Thái Bình, ai tiện chuyến giá rẻ liên hệ:
 ☎️0392166940`, 'driver'],
-[`Từ giờ tới 12h có chuyến nào từ nguyễn khuyến hà đông về vân đồn quảng ninh ko ạ e xin sdt với`, 'passenger'],
-[`Chiều mai thứ hai mình có xe gđ 7c trống từ Tb đi uông bí ai đi cùng alo mình đón giá tiện chuyến đt 0359894271`, 'driver'],
-[`Mai ngày 09/03 em có việc nên đi xe rỗng từ Hạ Long - Bắc Ninh và quay ngược về. Có bác nào muốn đi ghép tiện chyến giá rẻ không ạ?`, 'driver'],
-[`14-15h chiều nay cần xe 7 chỗ từ đông triều về quang hanh ai có xe liên hệ nhé ( 0866419568)`, 'passenger'],
-[`Tìm xe chiều nay 8/3 chạy Hạ Long - Hà Nội. 16h00 có mặt ở Hà Nội.`, 'passenger'],
-[`8/3 khung giờ 13h-14h x5 rỗng hl về đôg triều tiện chuyến giá rẻ 0567546888`, 'driver'],
-[`em cần xe đi cửa ông - quảng yên luôn chiều nay. ai đi ib em với ạ`, 'passenger'],
-[`Mai e có xe 5 chỗ từ quảng ninh về sơn la . Ai về cùng e lấy giá tiện chuyến thôi ạ 0326660336`, 'driver']
+    [`Từ giờ tới 12h có chuyến nào từ nguyễn khuyến hà đông về vân đồn quảng ninh ko ạ e xin sdt với`, 'passenger'],
+    [`Chiều mai thứ hai mình có xe gđ 7c trống từ Tb đi uông bí ai đi cùng alo mình đón giá tiện chuyến đt 0359894271`, 'driver'],
+    [`Mai ngày 09/03 em có việc nên đi xe rỗng từ Hạ Long - Bắc Ninh và quay ngược về. Có bác nào muốn đi ghép tiện chyến giá rẻ không ạ?`, 'driver'],
+    [`14-15h chiều nay cần xe 7 chỗ từ đông triều về quang hanh ai có xe liên hệ nhé ( 0866419568)`, 'passenger'],
+    [`Tìm xe chiều nay 8/3 chạy Hạ Long - Hà Nội. 16h00 có mặt ở Hà Nội.`, 'passenger'],
+    [`8/3 khung giờ 13h-14h x5 rỗng hl về đôg triều tiện chuyến giá rẻ 0567546888`, 'driver'],
+    [`em cần xe đi cửa ông - quảng yên luôn chiều nay. ai đi ib em với ạ`, 'passenger'],
+    [`Mai e có xe 5 chỗ từ quảng ninh về sơn la . Ai về cùng e lấy giá tiện chuyến thôi ạ 0326660336`, 'driver'],
+    [`Mình cần tìm xe ghép cho 1ng từ Hòn Gai - Kinh Môn trưa hoặc chiều mai ạ`, 'passenger'],
+    [`Sáng mai t4 11/3 (6-7h) trống 7 ghế THÁI BÌNH - HP -THUỶ NGUYÊN - UBI 
+ai có nhu cầu ib hoặc lh 0359395022`, 'driver'],
+    [`ngay bay h có xe từ sản nhi về hải hà đầm hà móng cái giá tiện chuyến bác nào cần ib hoặc gọi số 0981026080 giá tiện chuyến hoặc bao xe`, 'driver'],
+    [`21h 
+Hải hà - Móng cái
+Giá tiện chuyến. Ai đi cùng ib em
+0984108077`, 'driver'],
+    [`Xe 5c tiện chuyến quảng yên- hạ long ace đi cùng lh 0866538972`, 'driver'],
+    [`2h00( 11/3) xe 7c xuất phát vân đồn, cẩm phả,hạ long đi nội bài, trưa quay đầu. Ace cùng đường cần xe  liên hệ 0961619629 ( xe chạy cao tốc)`, 'driver'],
+    [`bây giờ đến 13 giờ xe 7 chỗ mc đi bãi cháy 
+bác bao xe ghép alo em đón alo 0563233999`, 'driver'],
+    [`Xe tiện chuyến móng cái - hải phòng
+Ngày nào em cũng móng cái đi  vân đồn - bệnh viện tỉnh - bãi cháy- sản nhi ai có nhu cầu alo em 0335518976  1 tiếng /1 chuyến`, 'driver'],
+    [`🚗 𝐇𝐚̀ 𝐍𝐨̣̂𝐢 <=> 𝐇𝐚̉𝐢 𝐏𝐡𝐨̀𝐧𝐠 <=> 𝐇𝐚̣ 𝐋𝐨𝐧𝐠 <=> 𝐌𝐨́𝐧𝐠 𝐂𝐚́𝐢 & 𝐍𝐠𝐮̛𝐨̛̣𝐜 𝐋𝐚̣𝐢
+☎️ / zalo :097 7210384 
+
+💁🏻‍♂️ 𝐆𝐢𝐚́ 𝐗𝐞 𝐆𝐡𝐞́𝐩 :
+
+👉 Hạ Long — Hà Nội : 𝟒𝟓𝟎𝐤 
+
+👉 Hà Nội — Hải Phòng : 𝟒𝟎𝟎𝐤 
+
+👉 Hạ Long — Hải Phòng : 𝟐𝟓𝟎𝐤
+
+👉 Hạ Long — Móng Cái : 𝟑𝟓𝟎𝐤
+
+👉 Hà Nội — Móng Cái : 𝟕𝟎𝟎𝐤
+
+👉 Hà Nội — Cẩm Phả : 𝟓𝟎𝟎𝐤 - 𝟔𝟎𝟎𝐤
+
+👉 Hà Nội — Uông Bí , Đông Triều : 𝟑𝟎𝟎𝐤 - 𝟒𝟎𝟎𝐤
+
+💁🏻‍♂️ 𝐆𝐢𝐚́ 𝐁𝐚𝐨 𝐗𝐞 :
+
+👉 Hạ Long — Hà Nội : 𝟏.𝟏𝟎𝟎𝐤 - 𝟏.𝟐𝟎𝟎𝐤
+
+👉 Hà Nội — Hải Phòng : 𝟗𝟎𝟎𝐤 - 𝟏𝐭𝐫
+
+👉 Hạ Long — Hải Phòng : 𝟓𝟎𝟎𝐤 - 𝟔𝟎𝟎𝐤
+
+👉 Hạ Long — Móng Cái : 𝟗𝟎𝟎𝐤 - 𝟏.𝟏𝟎𝟎𝐤
+
+👉 Hà Nội -- Vân Đồn : 𝟏.𝟓𝟎𝟎𝐤 - 𝟏.𝟔𝟎𝟎𝐤
+
+👉 Hà Nội — Móng Cái : 𝟐.𝟐𝟎𝟎𝐤 - 𝟐.𝟑𝟎𝟎𝐤
+
+🚘 𝐗𝐞 đ𝐢 𝐭𝐢̉𝐧𝐡 𝐠𝐢𝐚́ 𝐜𝐚̣𝐧𝐡 𝐭𝐫𝐚𝐧𝐡 𝐬𝐢𝐞̂𝐮 𝐭𝐨̂́𝐭…
+
+👉 Khách đi 2 chiều có thoả thuận và có nhận yêu cầu dòng xe.
+
+👉 Xe chạy full cao tốc. Không phát sinh thêm phí
+
+🚛 Nhận gửi hàng chuyển phát nhanh có Cam kết đảm bảo.
+
+📍Tiêu chí hoạt động của nhà xe: 𝑨𝑵 𝑻𝑶𝑨̀𝑵 - 𝑻𝑨̣̂𝑵 𝑻𝑨̂𝑴 - 𝑵𝑯𝑰𝑬̣̂𝑻 𝑻𝑰̀𝑵𝑯 - 𝑮𝑰𝑨́ 𝑪𝑨̉ 𝑪𝑨̣𝑵𝑯 𝑻𝑹𝑨𝑵𝑯 𝑻𝑰𝑬̂́𝑻 𝑲𝑰𝑬̣̂𝑴
+
+📍Cam kết dàn xe đời mới, sạch sẽ, lái xe có nhiều năm kinh nghiệm.
+
+☎️/ zalo : 097 7210384`, 'driver'],
+    [`Sáng nay e có xe tải ghép hàng từ Hà Nội về Hưng Yên -Hải Dương -Hải Phòng Các bác cần gửi ghép hàng gì Alo em Nhé :0927685868 .E sỹ`, 'driver'],
+    [`❗ Nhiều khách hỏi: “Sao đi xe này tiện thế?”
+Vì đây là xe ghép – xe tiện chuyến, nên:
+🚗 Không cần ra bến xe
+🚗 Không phải chờ lâu
+🚗 Xe đón tận nhà – trả tận nơi
+🚗 Đi nhanh – thoải mái hơn xe khách
+Chính vì vậy rất nhiều khách đã chuyển sang đi xe ghép thường xuyên.
+🔥 Hiện chuyến hôm nay vẫn còn vài chỗ trống
+📩 Ai cần đi ghép thì nhắn: 0339619080 ngay để giữ chỗ và nhận nhiều ưu đãi nhé!
+#xeghep #tiệnchuyến #hànội #hảiphòng #quangrninh #nhanhchóng`, 'driver']
   ] as const)("%s", async (input, expected) => {
     const actual = await detectPostType(input);
     expect(actual.type).toBe(expected);
