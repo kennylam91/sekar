@@ -136,10 +136,10 @@ export async function GET(request: Request) {
           group.facebook_id,
         );
 
-        // Skip posts without message
-        if (!newPost.content) {
+        // Skip posts without message or message it too short (less than 10 characters after trimming)
+        if (!newPost.content || newPost.content.trim().length < 10) {
           groupSkipped++;
-          console.log(`  ⊘ Post ${j + 1}/${postsCount}: Skipped (no message)`);
+          console.log(`  ⊘ Post ${j + 1}/${postsCount}: Skipped (no message or too short)`);
           continue;
         }
 
@@ -176,9 +176,16 @@ export async function GET(request: Request) {
           }
         }
 
+        // Detect post type (also identifies irrelevant posts as "other")
         const detected = await detectPostType(newPost.content);
         newPost.author_type = detected.type;
         newPost.used_llm = detected.usedLLM;
+        if (detected.type === "other") {
+          newPost.is_visible = false;
+          console.log(
+            `  ⊘ Post ${j + 1}/${postsCount}: Marked as not visible (not relevant to ride-sharing)`,
+          );
+        }
 
         try {
           const { error: insertError } = await supabase

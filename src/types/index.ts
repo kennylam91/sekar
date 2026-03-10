@@ -1,5 +1,5 @@
 export type UserRole = "driver" | "admin";
-export type AuthorType = "passenger" | "driver";
+export type AuthorType = "passenger" | "driver" | "other";
 
 export interface User {
   id: string;
