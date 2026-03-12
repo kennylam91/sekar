@@ -116,7 +116,9 @@ export default function FacebookGroupsManager() {
       />
 
       <DeleteConfirmModal
-        groupId={deletingId}
+        itemId={deletingId}
+        deleteUrl={(id) => `/api/admin/facebook-groups/${id}`}
+        confirmMessage="Bạn có chắc chắn muốn xóa nhóm này không? Hành động này không thể hoàn tác."
         onCancel={() => setDeletingId(null)}
         onDeleted={() => {
           setDeletingId(null);

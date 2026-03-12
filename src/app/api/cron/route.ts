@@ -1,4 +1,4 @@
-import { normalizeFacebookUrl } from "@/lib/url-utils";
+import { normalizeFacebookUrl, extractFacebookUserId } from "@/lib/url-utils";
 import { NextResponse } from "next/server";
 import { detectPostType } from "@/lib/post-type-detector";
 import { Post } from "@/types";
@@ -71,6 +71,22 @@ export async function GET(request: Request) {
   let totalFailedInserts = 0;
   let totalPassengerPosts = 0;
   const groupResults: any[] = [];
+
+  // Load known driver Facebook IDs for automatic post classification
+  const driverFacebookIdSet = new Set<string>();
+  const { data: driverFbIds, error: driverFbIdsError } = await supabase
+    .from("driver_facebook_ids")
+    .select("facebook_id");
+  if (driverFbIdsError) {
+    console.warn("⚠️ Failed to load driver_facebook_ids:", driverFbIdsError);
+  } else if (driverFbIds && driverFbIds.length > 0) {
+    for (const row of driverFbIds) {
+      driverFacebookIdSet.add(row.facebook_id);
+    }
+    console.log(
+      `✓ Loaded ${driverFacebookIdSet.size} known driver Facebook IDs`,
+    );
+  }
 
   // Use for...of instead of forEach to properly await async operations
   for (let i = 0; i < groups.length; i++) {
@@ -177,14 +193,24 @@ export async function GET(request: Request) {
         }
 
         // Detect post type (also identifies irrelevant posts as "other")
-        const detected = await detectPostType(newPost.content);
-        newPost.author_type = detected.type;
-        newPost.used_llm = detected.usedLLM;
-        if (detected.type === "other") {
-          newPost.is_visible = false;
+        // First check if the author is a known driver by their Facebook profile ID.
+        const authorFbId = extractAuthorFacebookId(fromApi as FromApi, fbPost);
+        if (authorFbId && driverFacebookIdSet.has(authorFbId)) {
+          newPost.author_type = "driver";
+          newPost.used_llm = false;
           console.log(
-            `  ⊘ Post ${j + 1}/${postsCount}: Marked as not visible (not relevant to ride-sharing)`,
+            `  ✓ Post ${j + 1}/${postsCount}: Classified as driver (known Facebook ID: ${authorFbId})`,
           );
+        } else {
+          const detected = await detectPostType(newPost.content ?? "");
+          newPost.author_type = detected.type;
+          newPost.used_llm = detected.usedLLM;
+          if (detected.type === "other") {
+            newPost.is_visible = false;
+            console.log(
+              `  ⊘ Post ${j + 1}/${postsCount}: Marked as not visible (not relevant to ride-sharing)`,
+            );
+          }
         }
 
         try {
@@ -398,5 +424,21 @@ function extractPosts(fromApi: FromApi, resData: any) {
       return resData.posts;
     case "facebook-scraper-api4":
       return resData.data?.posts;
+  }
+}
+
+/**
+ * Extracts the Facebook user/profile ID from the raw post object returned by
+ * each scraper API, so it can be matched against driver_facebook_ids.
+ */
+function extractAuthorFacebookId(fromApi: FromApi, fbPost: any): string | null {
+  switch (fromApi) {
+    case "facebook-scraper3":
+      return extractFacebookUserId(fbPost.author?.url ?? null);
+    case "facebook-scraper-api4":
+      // API4 exposes a numeric user ID directly when available
+      return fbPost.user_details?.id
+        ? String(fbPost.user_details.id)
+        : extractFacebookUserId(fbPost.user_details?.url ?? null);
   }
 }

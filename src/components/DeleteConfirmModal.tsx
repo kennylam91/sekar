@@ -3,13 +3,17 @@
 import { useState } from "react";
 
 type Props = {
-  groupId: string | null;
+  itemId: string | null;
+  deleteUrl: (id: string) => string;
+  confirmMessage?: string;
   onCancel: () => void;
   onDeleted: () => void;
 };
 
 export default function DeleteConfirmModal({
-  groupId,
+  itemId,
+  deleteUrl,
+  confirmMessage,
   onCancel,
   onDeleted,
 }: Props) {
@@ -17,16 +21,16 @@ export default function DeleteConfirmModal({
   const [error, setError] = useState<string | null>(null);
 
   async function handleDelete() {
-    if (!groupId) return;
+    if (!itemId) return;
     setSaving(true);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/facebook-groups/${groupId}`, {
+      const res = await fetch(deleteUrl(itemId), {
         method: "DELETE",
       });
       const json = await res.json();
       if (!res.ok) {
-        setError(json.error || "Lỗi xóa nhóm");
+        setError(json.error || "Lỗi xóa mục");
       } else {
         onDeleted();
       }
@@ -37,15 +41,15 @@ export default function DeleteConfirmModal({
     }
   }
 
-  if (!groupId) return null;
+  if (!itemId) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-xl shadow-xl max-w-sm w-full p-5 sm:p-6">
         <h3 className="text-lg font-bold text-gray-900 mb-2">Xác nhận xóa</h3>
         <p className="text-sm text-gray-600 mb-5">
-          Bạn có chắc chắn muốn xóa nhóm này không? Hành động này không thể hoàn
-          tác.
+          {confirmMessage ||
+            "Bạn có chắc chắn muốn xóa mục này không? Hành động này không thể hoàn tác."}
         </p>
 
         {error && (
