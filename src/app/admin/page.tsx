@@ -122,6 +122,17 @@ export default function AdminPage() {
             </p>
           </Link>
         </div>
+        <div className="bg-blue-50 rounded-xl border border-blue-200 p-4">
+          <Link
+            href="/admin/driver-facebook-ids"
+            className="flex flex-col items-start"
+          >
+            <p className="text-sm text-blue-600 m-0">Facebook ID tài xế</p>
+            <p className="text-2xl font-bold text-blue-900 m-0">
+              Quản lý →
+            </p>
+          </Link>
+        </div>
       </div>
 
       {/* Tab filter */}

@@ -48,6 +48,15 @@ export interface FacebookGroup {
   updated_at: string;
 }
 
+export interface DriverFacebookId {
+  id: string;
+  facebook_id: string;
+  name: string | null;
+  note: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface PostsResponse {
   posts: Post[];
   total: number;

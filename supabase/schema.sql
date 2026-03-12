@@ -38,6 +38,18 @@ CREATE TABLE fcm_tokens (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Driver Facebook IDs: maps a Facebook profile ID to "known driver"
+-- Posts imported by the cron job whose author matches an entry here are
+-- automatically classified as author_type = 'driver'.
+CREATE TABLE driver_facebook_ids (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  facebook_id VARCHAR(255) UNIQUE NOT NULL,
+  name VARCHAR(255),
+  note TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- Indexes for performance
 CREATE INDEX idx_posts_author_type ON posts(author_type);
 CREATE INDEX idx_posts_created_at ON posts(created_at DESC);
@@ -49,6 +61,7 @@ CREATE INDEX idx_fcm_tokens_user_id ON fcm_tokens(user_id);
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE fcm_tokens ENABLE ROW LEVEL SECURITY;
+ALTER TABLE driver_facebook_ids ENABLE ROW LEVEL SECURITY;
 
 -- Allow service role to bypass RLS
 CREATE POLICY "Service role full access on users" ON users
@@ -58,4 +71,7 @@ CREATE POLICY "Service role full access on posts" ON posts
   FOR ALL USING (true) WITH CHECK (true);
 
 CREATE POLICY "Service role full access on fcm_tokens" ON fcm_tokens
+  FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Service role full access on driver_facebook_ids" ON driver_facebook_ids
   FOR ALL USING (true) WITH CHECK (true);

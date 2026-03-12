@@ -25,3 +25,40 @@ export function normalizeFacebookUrl(raw?: string): string | null {
     return url;
   }
 }
+
+/**
+ * Extracts the Facebook user/profile identifier from a Facebook profile URL.
+ * Returns a numeric ID string (e.g. "100001234567890") when available,
+ * otherwise the path-based username (e.g. "john.doe").
+ * Returns null if the URL cannot be parsed or has no meaningful identifier.
+ */
+export function extractFacebookUserId(raw?: string | null): string | null {
+  const url = (raw || "").trim();
+  if (!url) return null;
+  try {
+    const u = new URL(url);
+
+    // profile.php?id=<numeric_id>
+    if (u.pathname.includes("/profile.php")) {
+      const id = u.searchParams.get("id");
+      if (id) return id;
+    }
+
+    // /user/<numeric_id> segment (e.g. /groups/.../user/10000/...)
+    const userSegment = u.pathname.match(/\/user\/(\d+)/);
+    if (userSegment?.[1]) return userSegment[1];
+
+    // Numeric ?id= query param on any path
+    const idParam = u.searchParams.get("id");
+    if (idParam && /^\d+$/.test(idParam)) return idParam;
+
+    // Last non-empty path segment as username (e.g. /john.doe or /john.doe/)
+    const segments = u.pathname.split("/").filter(Boolean);
+    const last = segments[segments.length - 1];
+    if (last && last !== "groups" && last !== "profile.php") return last;
+
+    return null;
+  } catch {
+    return null;
+  }
+}
