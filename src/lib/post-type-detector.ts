@@ -46,7 +46,7 @@ const DRIVER_PATTERNS: WeightedPattern[] = [
   { pattern: /đón\s+tận\s+nơi/, weight: 3 }, // "đưa đón tận nơi" — driver's service phrase
   { pattern: /xe\s+(?:mình|em)\s+từ/, weight: 3 }, // "xe em từ HN về HL" — driver's vehicle route
   { pattern: /xe\s+(?:mình|em)\s+\d/, weight: 3 }, // "xe em 5c" — driver's specific vehicle capacity
-  { pattern: /(đưa|e|em)\s+đón/, weight: 3 }, // "đưa đón sân bay" — driver airport transfer service
+  { pattern: /(e|em)\s+đón/, weight: 3 },
   { pattern: /\s+(e|em)\s+ghép\s+cho/, weight: 3 }, // "ghép cho" — driver offering to add passengers
   { pattern: /hằng\s+ngày/, weight: 3 }, // "ib em" — driver asking passengers to message them
   { pattern: /khách\s+bao\s+xe/, weight: 3 }, // "khách bao xe" — passengers can charter, ie driver listing service
@@ -54,7 +54,7 @@ const DRIVER_PATTERNS: WeightedPattern[] = [
   { pattern: /nhận\s+chở\s+hàng/, weight: 3 },
   { pattern: /nhận\s+hàng\s+tận\s+nhà/, weight: 3 },
   { pattern: /đón\s+trả\s+tận\s+nơi/, weight: 3 },
-  { pattern: /có\s+xe\s+\d+\s+chỗ\s+trống/, weight: 3 },
+  { pattern: /xe\s+\d+\s+chỗ\s+trống/, weight: 3 },
   { pattern: /ngày\s+trong\s+tuần/, weight: 3 },
   { pattern: /đi\s+xe\s+rỗng/, weight: 3 },
   { pattern: /tiện\s+chuyến\s+giá\s+rẻ/, weight: 3 },
@@ -64,6 +64,9 @@ const DRIVER_PATTERNS: WeightedPattern[] = [
   { pattern: /ai\s+có\s+nhu\s+cầu/, weight: 3 }, // "ai có nhu cầu"
   { pattern: /(e|em)\s+có\s+xe/, weight: 3 }, // "e có xe"
   { pattern: /#xeghep/, weight: 3 }, // "#xeghep" — driver hashtag
+  { pattern: /đón\s+trả\s+tận\s+nơi/, weight: 3 },
+  { pattern: /^xe\s+tìm\s+kh/, weight: 3 },
+
 
 ];
 
@@ -105,7 +108,13 @@ const PASSENGER_PATTERNS: WeightedPattern[] = [
   { pattern: /cần\s+tìm\s+xe/, weight: 3 }, // "cần tìm xe" — passenger looking for a ride
   { pattern: /có\s+\d+người/, weight: 3 },
   { pattern: /ai\s+có\s+xe/, weight: 3 },
-  { pattern: /^tìm\s+xe/, weight: 3 }
+  { pattern: /^tìm\s+xe/, weight: 3 },
+  { pattern: /^em\s+cần\s+tìm/, weight: 3 },
+  { pattern: /^cần\s+gửi/, weight: 3 },
+  { pattern: /^(em|e)\s+cần\s+gửi/, weight: 3 },
+  { pattern: /^cần\s+tìm\s+xe/, weight: 3 },
+  { pattern: /^em\s+tìm\s+xe/, weight: 3 },
+
 ];
 
 /** Minimum score from a single weight-3 pattern to be considered a "strong" signal. */
@@ -222,6 +231,11 @@ export async function detectPostType(
 ): Promise<{ type: AuthorType; usedLLM: boolean; fallback: boolean }> {
   if (!content || typeof content !== "string")
     return { type: "other", usedLLM: false, fallback: false };
+
+  const LENGTH_THRESHOLD = 250; // max length of passenger posts
+  if (content.length > LENGTH_THRESHOLD) {
+    return { type: "driver", usedLLM: false, fallback: false };
+  }
 
   const normalized = content.normalize("NFKC").toLowerCase();
   const driverScore = score(normalized, DRIVER_PATTERNS);

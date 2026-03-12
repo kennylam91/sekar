@@ -424,7 +424,17 @@ Vì đây là xe ghép – xe tiện chuyến, nên:
 Chính vì vậy rất nhiều khách đã chuyển sang đi xe ghép thường xuyên.
 🔥 Hiện chuyến hôm nay vẫn còn vài chỗ trống
 📩 Ai cần đi ghép thì nhắn: 0339619080 ngay để giữ chỗ và nhận nhiều ưu đãi nhé!
-#xeghep #tiệnchuyến #hànội #hảiphòng #quangrninh #nhanhchóng`, 'driver']
+#xeghep #tiệnchuyến #hànội #hảiphòng #quangrninh #nhanhchóng`, 'driver'],
+    [`Em cần tìm bao xe cho 7 người đi từ Hà Nội xuống Vân Đồn, anh chị cho em xin giá với ạ. Nếu được em đặt 2 chiều cả đi và về ạ`, 'passenger'],
+    [`Cần Gửi ít đồ từ Hà Nội đi - Hạ Long`, 'passenger'],
+    [`cần tìm xe riêng đưa đón khứ hồi HN- Quảng Ninh trong ngày`, 'passenger'],
+    [`Chiều tối mai (13/3). Xe 5 chỗ trống chạy tiện chuyến từ Cẩm Phả về Thái Bình. Ai cần LH: 0334230788`, 'driver'],
+    [`Em tìm xe ghép từ Hạ Long lên Hà Nội có nhận cho mang theo mèo ạ`, 'passenger'],
+    [`Em cần gửi hàng từ bát tràng về Phường Quang Hanh (phường Cẩm Thủy, TP Cẩm Phả cũ), tỉnh Quảng Ninh 0968193662`, 'passenger'],
+    [`Xe tìm khach 11/3
+15-18h chiều nay xe 5c tiện chuyến 
+Ha long - Hà Nội 
+0928766766`, 'driver'],
   ] as const)("%s", async (input, expected) => {
     const actual = await detectPostType(input);
     expect(actual.type).toBe(expected);
