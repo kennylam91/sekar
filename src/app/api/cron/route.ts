@@ -160,7 +160,7 @@ async function processGroup(
   let reachedKnownPost = false;
 
   try {
-    while (pageIndex < MAX_FETCH_PAGES) {
+    while (pageIndex < Number(MAX_FETCH_PAGES)) {
       pageIndex++;
       console.log(
         `  📄 Page ${pageIndex} for group ${group.facebook_id}${cursor ? " (with cursor)" : ""}`,
@@ -313,7 +313,7 @@ async function processGroup(
       await new Promise((resolve) => setTimeout(resolve, 1000)); // delay between pages
     }
 
-    if (pageIndex >= MAX_FETCH_PAGES) {
+    if (pageIndex >= Number(MAX_FETCH_PAGES)) {
       console.log(
         `  ⚠️ Reached max page limit (${MAX_FETCH_PAGES}) for group ${group.facebook_id}`,
       );
