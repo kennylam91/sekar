@@ -55,3 +55,24 @@ export interface PostsResponse {
   pageSize: number;
   totalPages: number;
 }
+
+export interface GroupDailyStat {
+  date: string; // "YYYY-MM-DD" in Asia/Ho_Chi_Minh timezone
+  total: number;
+  passenger: number;
+}
+
+export interface GroupStatSummary {
+  total: number;
+  passenger: number;
+  passenger_pct: number; // 0-100; 0 when total = 0
+}
+
+export interface GroupStats {
+  group_id: string;
+  name: string;
+  today: GroupStatSummary;
+  month: GroupStatSummary;
+  alltime: GroupStatSummary;
+  daily: GroupDailyStat[]; // last 14 days, oldest first
+}
