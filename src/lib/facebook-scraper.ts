@@ -69,6 +69,22 @@ export function extractFacebookId(fromApi: FromApi, fbPost: any): string | null 
   }
 }
 
+/** Returns the post's publish time as a ms-since-epoch number, or null if unavailable. */
+export function extractPostTimestamp(fromApi: FromApi, fbPost: any): number | null {
+  switch (fromApi) {
+    case "facebook-scraper3": {
+      const ts = fbPost?.timestamp;
+      return typeof ts === "number" ? ts * 1000 : null;
+    }
+    case "facebook-scraper-api4": {
+      const iso = fbPost?.values?.publish_time;
+      if (!iso) return null;
+      const ms = Date.parse(iso);
+      return isNaN(ms) ? null : ms;
+    }
+  }
+}
+
 export function buildPostEntity(
   fromApi: FromApi,
   fbPost: any,

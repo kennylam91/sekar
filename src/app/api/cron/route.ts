@@ -9,6 +9,7 @@ import {
   extractPosts,
   extractCursor,
   extractFacebookId,
+  extractPostTimestamp,
   buildPostEntity,
 } from "@/lib/facebook-scraper";
 
@@ -304,6 +305,18 @@ async function processGroup(
       }
 
       if (reachedKnownPost) break;
+
+      // Only fetch the next page if the last post on this page was published within the last 10 minutes
+      const lastFbPost = fbPosts[fbPosts.length - 1];
+      const lastPostTimestamp = extractPostTimestamp(fromApi, lastFbPost);
+      const tenMinutesAgo = Date.now() - 10 * 60 * 1000;
+      if (lastPostTimestamp !== null && lastPostTimestamp < tenMinutesAgo) {
+        console.log(
+          `  ℹ️ Last post on page ${pageIndex} was published more than 10 minutes ago — stopping pagination`,
+        );
+        break;
+      }
+
       const nextCursor = extractCursor(fromApi, resData);
       if (!nextCursor) {
         console.log(`  ℹ️ No next cursor, stopping pagination`);
