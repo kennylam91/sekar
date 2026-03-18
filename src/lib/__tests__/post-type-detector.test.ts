@@ -435,6 +435,16 @@ Chính vì vậy rất nhiều khách đã chuyển sang đi xe ghép thường 
 15-18h chiều nay xe 5c tiện chuyến 
 Ha long - Hà Nội 
 0928766766`, 'driver'],
+    [
+      `Xe e đang uông bí lên ha nội luôn ai đi lh 0838210192`,
+      'driver'
+    ],
+    [`E cân xe cửa ông về bãi cháy a nào chạy mềm alo e0968768211`, 'passenger'],
+    [`Nhà mình ai cần bao xe năm chỗ từ Quảng Ninh đi các tỉnh thì tối em nhé 
+0963028048`, 'driver'],
+    [`Mình cần xe ghép 1 người từ Lạc Trung 17h chiều mai về Hạ Long`, 'passenger'],
+    [`Em muốn thuê 1 xe 16 chỗ 8h30 sáng chủ nhật (22/3) đón ở Đại học Thủy Lợi, Đống Đa về  Nghi Lộc, Sơn Công, Ứng Hòa, Hà Nội. Em xin giá 2 chiều ạ`, 'passenger'],
+
   ] as const)("%s", async (input, expected) => {
     const actual = await detectPostType(input);
     expect(actual.type).toBe(expected);
