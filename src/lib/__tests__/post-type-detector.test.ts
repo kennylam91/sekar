@@ -444,6 +444,26 @@ Ha long - Hà Nội
 0963028048`, 'driver'],
     [`Mình cần xe ghép 1 người từ Lạc Trung 17h chiều mai về Hạ Long`, 'passenger'],
     [`Em muốn thuê 1 xe 16 chỗ 8h30 sáng chủ nhật (22/3) đón ở Đại học Thủy Lợi, Đống Đa về  Nghi Lộc, Sơn Công, Ứng Hòa, Hà Nội. Em xin giá 2 chiều ạ`, 'passenger'],
+    [`Sáng thứ 7 , 7:30 mình cần xe ghép hạ long -> sân bay vân đồn . Báo giá luôn giúp mình ạ`, 'passenger'],
+    [`E cân xe cửa ông về bãi cháy a nào chạy mềm alo e0968768211`, 'passenger'],
+    [`20/3 (9h-16h)có xe 5c.7c chạy full cao tốc từ
+Hà Nội-Hải Phòng-Sản  Nhi - Hạ Long-  Móng Cái .
+Bx góp xăng lh
+SĐT.0862.898.211`, 'driver'],
+    [`Sáng , chiều thứ 7 tuần này mik có chuyến 2 chiều lên hà nội ae nào đi cùng ib 093 6813151`, 'driver'],
+    [`Xe gia đình tiện chuyến trống hàng ghế sau sáng T7 (21/3) HN- Hạ Long. Bác nào góp xăng liên hệ 0904236789`, 'driver'],
+    [`Hàng ngày xe nhà e vẫn chạy cao tốc 
+Mông dương - hà nội nhé các bác
+Cần đi lại alo e hùng đón ạ`, 'driver'],
+    [`Mai 6-8h 20/03. . X7 chạy full ct. Móng Cái - hạ Long.khách cần xe (gửi đồ). Lh. 0388.865.899`, 'driver'],
+    [`Bây h e cần 2 gế từ viện bãi cháy về địa chất. Bác nào đón đc alo e với`, 'passenger'],
+    [`Cần chở 1 máy sấy 60x60 cao 85 từ 16 Nguyễn lương bằng lê Thanh Nghị Hải Phòng 
+
+về Phú lương Hà Đông 
+
+xe nào ghép được em xin giá
+ 
+0359391997`, 'passenger'],
 
   ] as const)("%s", async (input, expected) => {
     const actual = await detectPostType(input);
