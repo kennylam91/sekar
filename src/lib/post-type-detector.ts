@@ -38,7 +38,7 @@ const DRIVER_PATTERNS: WeightedPattern[] = [
   { pattern: /bao\s+cả\s+xe/, weight: 3 }, // "bao cả xe" — driver offering full charter
   { pattern: /bao\s+xe\s+từ/, weight: 3 }, // "bao xe từ Xk" — driver listing charter prices
   { pattern: /nhận\s+ghép\s+xe/, weight: 3 }, // "nhận ghép xe" — driver accepting shared-ride requests
-  { pattern: /xe\s+nhà\s+(?:mình|em)\s+chạy/, weight: 3 }, // "xe nhà mình/em chạy" — driver's business vehicle
+  { pattern: /xe\s+nhà\s+(?:mình|em|e)/, weight: 3 }, // "xe nhà mình/em chạy" — driver's business vehicle
   { pattern: /24\/7/, weight: 3 }, //
   { pattern: /vf/, weight: 3 }, //
   { pattern: /24\/24/, weight: 3 },
@@ -68,6 +68,10 @@ const DRIVER_PATTERNS: WeightedPattern[] = [
   { pattern: /^xe\s+tìm\s+kh/, weight: 3 },
   { pattern: /^xe\s+(e|em)/, weight: 3 },
   { pattern: /ai\s+góp\s+xăng/, weight: 3 },
+  { pattern: /full\s+(cao\s+tốc|ct)/, weight: 3 },
+  { pattern: /ae\s+nào\s+đi\s+cùng/, weight: 3 },
+  { pattern: /xe\s+gia\s+đình/, weight: 3 },
+  { pattern: /xe\s+chở\s+gió/, weight: 3 },
 ];
 
 /**
@@ -77,7 +81,7 @@ const PASSENGER_PATTERNS: WeightedPattern[] = [
   { pattern: /có\s+xe\s+ghép\s+nào/, weight: 3 }, // "có xe ghép nào" — asking for shared ride
   { pattern: /có\s+xe\s+tiện\s+chuyến\s+nào/, weight: 3 }, // "có xe tiện chuyến nào"
   { pattern: /có\s+nhà\s+xe\s+nào/, weight: 3 }, // "có nhà xe nào"
-  { pattern: /cần\s+\d+\s+ghế/, weight: 3 }, // "cần 2 ghế"
+  { pattern: /cần\s+\d+\s+(ghế|gế)/, weight: 3 }, // "cần 2 ghế"
   { pattern: /muốn\s+ghép\s+\d*\s*ghế/, weight: 3 }, // "muốn ghép 2 ghế"
   { pattern: /cho\s+e\s+\d*\s*(?:một\s+)?ghế/, weight: 3 }, // "cho e một ghế", "cho e 1 ghế"
   { pattern: /cần\s+\d+\s+vé/, weight: 3 }, // "cần 2 vé"
@@ -109,7 +113,7 @@ const PASSENGER_PATTERNS: WeightedPattern[] = [
   { pattern: /ai\s+có\s+xe/, weight: 3 },
   { pattern: /^tìm\s+xe/, weight: 3 },
   { pattern: /^em\s+cần\s+tìm/, weight: 3 },
-  { pattern: /^cần\s+gửi/, weight: 3 },
+  { pattern: /^cần\s+(gửi|chở)/, weight: 3 },
   { pattern: /^(em|e)\s+cần\s+gửi/, weight: 3 },
   { pattern: /^(cần|em|e|m|mình)\s+tìm\s+xe/, weight: 3 },
   { pattern: /^(em|e)\s+muốn/, weight: 3 },
