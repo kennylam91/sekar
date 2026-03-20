@@ -228,7 +228,7 @@ async function processGroup(
           group.facebook_id,
         );
 
-        if (!newPost.content || newPost.content.trim().length < 10) {
+        if (!newPost.content || newPost.content.trim().length < 20) {
           skipped++;
           console.log(
             `  ⊘ Post ${j + 1}/${postsCount}: Skipped (no message or too short)`,
@@ -306,13 +306,14 @@ async function processGroup(
 
       if (reachedKnownPost) break;
 
-      // Only fetch the next page if the last post on this page was published within the last 10 minutes
+      // Only fetch the next page if the last post on this page was published within the last 15 minutes
       const lastFbPost = fbPosts[fbPosts.length - 1];
       const lastPostTimestamp = extractPostTimestamp(fromApi, lastFbPost);
-      const tenMinutesAgo = Date.now() - 10 * 60 * 1000;
-      if (lastPostTimestamp !== null && lastPostTimestamp < tenMinutesAgo) {
+      const POST_MINS_THRESHOLD = 15;
+      const fifteenMinutesAgo = Date.now() - POST_MINS_THRESHOLD * 60 * 1000;
+      if (lastPostTimestamp !== null && lastPostTimestamp < fifteenMinutesAgo) {
         console.log(
-          `  ℹ️ Last post on page ${pageIndex} was published more than 10 minutes ago — stopping pagination`,
+          `  ℹ️ Last post on page ${pageIndex} was published more than ${POST_MINS_THRESHOLD} minutes ago — stopping pagination`,
         );
         break;
       }

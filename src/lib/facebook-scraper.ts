@@ -4,7 +4,7 @@ import { extractPhone } from "@/lib/posts";
 
 export type FromApi = "facebook-scraper3" | "facebook-scraper-api4";
 
-export function fetchFbPosts(
+export async function fetchFbPosts(
   fromApi: FromApi,
   groupId: string,
   cursor?: string,
@@ -28,13 +28,25 @@ export function fetchFbPosts(
 
   console.log(`📡 Fetching from: ${url}`);
   const apiKey = process.env.NEXT_RAPID_API_KEY;
-  return fetch(url, {
+  const options: RequestInit = {
     method: "GET",
     headers: {
       "x-rapidapi-host": host,
       "x-rapidapi-key": apiKey!,
     },
-  });
+  };
+
+  const maxRetries = 2;
+  let attempt = 0;
+  while (true) {
+    const res = await fetch(url, options);
+    if (res.status !== 429 || attempt >= maxRetries) return res;
+    attempt++;
+    const retryAfter = res.headers.get("Retry-After");
+    const waitMs = retryAfter ? parseFloat(retryAfter) * 1000 : 2 ** attempt * 1000;
+    console.warn(`⚠️ Rate limited (429). Retrying in ${waitMs}ms (attempt ${attempt}/${maxRetries})...`);
+    await new Promise((resolve) => setTimeout(resolve, waitMs));
+  }
 }
 
 export function extractPosts(fromApi: FromApi, resData: any): any[] {
