@@ -226,31 +226,10 @@ async function processGroup(
           group.facebook_id,
         );
 
-        if (!newPost.content || newPost.content.trim().length < 20) {
+        const skipReason = await getSkipReason(newPost, createdAuthorNames);
+        if (skipReason) {
           skipped++;
-          console.log(
-            `  ⊘ Post ${j + 1}/${postsCount}: Skipped (no message or too short)`,
-          );
-          continue;
-        }
-
-        if (newPost.author_name && createdAuthorNames.has(newPost.author_name)) {
-          skipped++;
-          console.log(
-            `  ⊘ Post ${j + 1}/${postsCount}: Skipped (duplicate author name)`,
-          );
-          continue;
-        }
-
-        if (
-          newPost.author_name &&
-          newPost.phone &&
-          (await isAuthorPostedRecently(newPost))
-        ) {
-          skipped++;
-          console.log(
-            `  ⊘ Post ${j + 1}/${postsCount}: Skipped (duplicated within 4 hours)`,
-          );
+          console.log(`  ⊘ Post ${j + 1}/${postsCount}: Skipped (${skipReason})`);
           continue;
         }
 
@@ -354,6 +333,25 @@ async function processGroup(
     );
     return { group: group.facebook_id, status: "error", error: String(err) };
   }
+}
+
+async function getSkipReason(
+  newPost: Partial<Post>,
+  createdAuthorNames: Set<string>,
+): Promise<string | null> {
+  if (!newPost.content || newPost.content.trim().length < 20) {
+    return "no message or too short";
+  }
+  if (newPost.author_name && createdAuthorNames.has(newPost.author_name)) {
+    return "duplicated author name";
+  }
+  if (
+    newPost.phone &&
+    (await isAuthorPostedRecently(newPost))
+  ) {
+    return "duplicated within 4 hours";
+  }
+  return null;
 }
 
 async function isAuthorPostedRecently(post: Partial<Post>): Promise<boolean> {

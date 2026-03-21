@@ -231,7 +231,7 @@ async function classifyViaLLM(
  * 3. On LLM failure → fall back to score comparison (ties → "driver").
  */
 export async function detectPostType(
-  content: string,
+  content: string | null | undefined,
 ): Promise<{ type: AuthorType; usedLLM: boolean; fallback: boolean }> {
   if (!content || typeof content !== "string")
     return { type: "other", usedLLM: false, fallback: false };
