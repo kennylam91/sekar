@@ -74,8 +74,6 @@ export async function GET(request: Request) {
     console.log(
       `\n--- Processing group ${i + 1}/${groups.length}: ${group.facebook_id} ---`,
     );
-    await new Promise((resolve) => setTimeout(resolve, 1500)); // delay between groups to avoid rate limits
-
     const result = await processGroup(fromApi as FromApi, group, anonymousUserId);
     groupResults.push(result);
 
@@ -324,7 +322,6 @@ async function processGroup(
         break;
       }
       cursor = nextCursor;
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // delay between pages
     }
 
     if (pageIndex >= Number(MAX_FETCH_PAGES)) {
